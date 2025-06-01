@@ -86,7 +86,7 @@ export default function HomePage({ language, setLanguage }: HomePageProps) {
   return (
     <div className="min-h-screen bg-white">
       <Header language={language} setLanguage={setLanguage} />
-      <Hero content={t} language={language} />
+      <Hero />
       <About content={t} />
       <Schedule content={t} />
       <Contact content={t} language={language} />
