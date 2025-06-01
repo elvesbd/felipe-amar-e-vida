@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom"
 
 import HomePage from "./pages/Home"
 import GalleryPage from "./pages/Gallery"
+import EventsPage from "./pages/Events"
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage language={language} setLanguage={setLanguage} />} />
         <Route path="/gallery" element={<GalleryPage language={language} setLanguage={setLanguage} />} />
+        <Route path="/events" element={<EventsPage language={language} setLanguage={setLanguage} />} />
       </Routes>
     </div>
   )

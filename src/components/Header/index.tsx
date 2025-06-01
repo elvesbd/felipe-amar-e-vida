@@ -65,6 +65,10 @@ export default function Header({ language, setLanguage }: HeaderProps) {
     navigate("/gallery")
   }
 
+  const handleEventsClick = () => {
+    navigate("/events")
+  }
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3">
@@ -100,7 +104,7 @@ export default function Header({ language, setLanguage }: HeaderProps) {
               {t.nav.gallery}
             </button>
             <button
-              onClick={() => scrollToSection("events")}
+              onClick={handleEventsClick}
               className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
             >
               {t.nav.events}

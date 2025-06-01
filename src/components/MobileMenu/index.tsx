@@ -75,6 +75,11 @@ export default function MobileMenu({ language }: MobileMenuProps) {
     navigate("/gallery")
   }
 
+  const handleEventsClick = () => {
+    setIsOpen(false)
+    navigate("/events")
+  }
+
   return (
     <div className="lg:hidden">
       <Button
@@ -122,7 +127,7 @@ export default function MobileMenu({ language }: MobileMenuProps) {
             {t.nav.gallery}
           </button>
           <button
-            onClick={() => scrollToSection("events")}
+            onClick={handleEventsClick}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
             {t.nav.events}
