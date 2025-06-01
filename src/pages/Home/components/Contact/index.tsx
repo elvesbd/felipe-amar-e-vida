@@ -4,7 +4,6 @@ import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
 import { Input } from "../../../../components/Input"
 import { Button } from "../../../../components/Button"
 import { Textarea } from "../../../../components/TextArea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/Card"
 
 interface ContactProps {
   readonly content: any

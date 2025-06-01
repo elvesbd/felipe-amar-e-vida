@@ -7,7 +7,7 @@ export interface HeroProps {
   readonly language: string
 }
 
-export default function Hero({ content, language }: HeroProps) {
+export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
 
   const slides = [
