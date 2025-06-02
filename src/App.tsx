@@ -1,23 +1,28 @@
-"use client"
+import { useEffect, useState } from "react"
 
-import { useState } from "react"
-import { Routes, Route } from "react-router-dom"
-
-import HomePage from "./pages/Home"
-import GalleryPage from "./pages/Gallery"
-import EventsPage from "./pages/Events"
+import AppRoutes from "./routes/components/AppRoutes"
+import { useTranslation } from "react-i18next"
 
 
 function App() {
-  const [language, setLanguage] = useState<"pt" | "en">("pt")
+  const { i18n } = useTranslation()
+  const [language, setLanguage] = useState(i18n.language)
+
+  useEffect(() => {
+    const handler = (lng: string) => setLanguage(lng)
+    i18n.on("languageChanged", handler)
+
+    return () => {
+      i18n.off("languageChanged", handler)
+    }
+  }, [i18n])
 
   return (
     <div className="min-h-screen bg-white">
-      <Routes>
-        <Route path="/" element={<HomePage language={language} setLanguage={setLanguage} />} />
-        <Route path="/gallery" element={<GalleryPage language={language} setLanguage={setLanguage} />} />
-        <Route path="/events" element={<EventsPage language={language} setLanguage={setLanguage} />} />
-      </Routes>
+      <AppRoutes language={language} setLanguage={(lng) => {
+        i18n.changeLanguage(lng)
+        setLanguage(lng)
+      }} />
     </div>
   )
 }

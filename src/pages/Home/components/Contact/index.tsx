@@ -12,6 +12,8 @@ interface ContactProps {
 }
 
 export default function Contact({ content, language }: ContactProps) {
+  const socialMediaText = language === "pt" ? "Siga nas redes sociais" : "Follow us on social media"
+
   return (
     <section id="contact" className="py-16 bg-white">
       <div className="container mx-auto px-4">
@@ -33,12 +35,7 @@ export default function Contact({ content, language }: ContactProps) {
             </div>
 
             <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">
-                {language === "pt"
-                  ? "Siga nas redes sociais"
-                  : "Follow us on social media"
-                }
-              </h3>
+              <h3 className="text-xl font-semibold mb-4">{socialMediaText}</h3>
               <div className="flex space-x-6">
                 <a href="#" className="hover:opacity-80 transition-opacity" title="Facebook">
                   <FaFacebook size={36} className="text-[#1877F2]" />

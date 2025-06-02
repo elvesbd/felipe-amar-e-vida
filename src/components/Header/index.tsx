@@ -1,5 +1,6 @@
-"use client"
+import { useTranslation } from "react-i18next"
 import { useNavigate, useLocation } from "react-router-dom"
+
 import MobileMenu from "../MobileMenu"
 
 interface HeaderProps {
@@ -10,29 +11,8 @@ interface HeaderProps {
 export default function Header({ language, setLanguage }: HeaderProps) {
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useTranslation()
 
-  const content = {
-    pt: {
-      nav: {
-        home: "Início",
-        about: "Sobre",
-        gallery: "Galeria",
-        events: "Eventos",
-        contact: "Contato",
-      },
-    },
-    en: {
-      nav: {
-        home: "Home",
-        about: "About",
-        gallery: "Gallery",
-        events: "Events",
-        contact: "Contact",
-      },
-    },
-  }
-
-  const t = content[language]
 
   const scrollToSection = (sectionId: string) => {
     if (location.pathname !== "/") {
@@ -89,31 +69,31 @@ export default function Header({ language, setLanguage }: HeaderProps) {
               onClick={() => scrollToSection("home")}
               className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
             >
-              {t.nav.home}
+              {t("nav.home")}
             </button>
             <button
               onClick={() => scrollToSection("about")}
               className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
             >
-              {t.nav.about}
+              {t("nav.about")}
             </button>
             <button
               onClick={handleGalleryClick}
               className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
             >
-              {t.nav.gallery}
+              {t("nav.gallery")}
             </button>
             <button
               onClick={handleEventsClick}
               className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
             >
-              {t.nav.events}
+              {t("nav.events")}
             </button>
             <button
               onClick={() => scrollToSection("contact")}
               className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
             >
-              {t.nav.contact}
+              {t("nav.contact")}
             </button>
           </nav>
 

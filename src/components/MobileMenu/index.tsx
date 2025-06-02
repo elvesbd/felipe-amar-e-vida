@@ -1,18 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { LogIn, Menu, X } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Button } from "../Button"
+import { useAuth } from "../../contexts/AuthContext"
 
 interface MobileMenuProps {
-  language: "pt" | "en"
+  readonly language: "pt" | "en"
 }
 
 export default function MobileMenu({ language }: MobileMenuProps) {
-  const [isOpen, setIsOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const { isAuthenticated, isAdmin } = useAuth()
+
+  const [isOpen, setIsOpen] = useState(false)
 
   const content = {
     pt: {
@@ -22,6 +25,8 @@ export default function MobileMenu({ language }: MobileMenuProps) {
         gallery: "Galeria",
         events: "Eventos",
         contact: "Contato",
+        admin: "Área Admin",
+        login: "Login",
       },
     },
     en: {
@@ -31,6 +36,8 @@ export default function MobileMenu({ language }: MobileMenuProps) {
         gallery: "Gallery",
         events: "Events",
         contact: "Contact",
+        admin: "Admin Area",
+        login: "Login",
       },
     },
   }
@@ -80,6 +87,11 @@ export default function MobileMenu({ language }: MobileMenuProps) {
     navigate("/events")
   }
 
+  const handleAdminClick = () => {
+    setIsOpen(false)
+    navigate("/login")
+  }
+
   return (
     <div className="lg:hidden">
       <Button
@@ -97,7 +109,7 @@ export default function MobileMenu({ language }: MobileMenuProps) {
 
       {/* Menu Móvel */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="flex justify-between items-center p-4 border-b">
@@ -137,6 +149,18 @@ export default function MobileMenu({ language }: MobileMenuProps) {
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
             {t.nav.contact}
+          </button>
+
+          {/* Divisor */}
+          <div className="border-t my-2"></div>
+
+          {/* Botão Admin/Login */}
+          <button
+            onClick={handleAdminClick}
+            className="py-3 px-4 text-left text-[#63A6DC] hover:bg-gray-100 rounded-md transition-colors flex items-center"
+          >
+            <LogIn className="h-4 w-4 mr-2" />
+            {isAuthenticated && isAdmin ? t.nav.admin : t.nav.login}
           </button>
         </nav>
 
