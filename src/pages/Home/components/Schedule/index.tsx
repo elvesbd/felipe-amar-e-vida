@@ -1,7 +1,8 @@
 import { Calendar, Clock, MapPin } from "lucide-react"
+import type { LanguageContent } from "../About/interfaces/content.interface"
 
 interface ScheduleProps {
-  readonly content: any
+  readonly content: LanguageContent
 }
 
 export default function Schedule({ content }: ScheduleProps) {

@@ -9,6 +9,7 @@ import { Badge } from "../../components/Badge"
 import { Button } from "../../components/Button"
 import PhotoModal from "../../components/PhotoModal"
 import type { Photo } from "./interfaces/photo.interface"
+import Footer from "../Home/components/Footer"
 
 interface GalleryPageProps {
   readonly language: "pt" | "en"
@@ -61,6 +62,42 @@ export default function GalleryPage({ language, setLanguage }: GalleryPageProps)
       alt: "Competição de surfe adaptado",
       category: "Eventos",
     },
+    {
+      id: 7,
+      src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+      alt: "Aula de surfe adaptado na Praia do Futuro",
+      category: "Aulas",
+    },
+    {
+      id: 8,
+      src: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+      alt: "Aluno praticando surfe com instrutor",
+      category: "Aulas",
+    },
+    {
+      id: 9,
+      src: "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+      alt: "Evento de confraternização do projeto",
+      category: "Eventos",
+    },
+    {
+      id: 10,
+      src: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+      alt: "Equipamentos de surfe adaptado",
+      category: "Equipamentos",
+    },
+    {
+      id: 11,
+      src: "https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+      alt: "Grupo de alunos na praia",
+      category: "Aulas",
+    },
+    {
+      id: 12,
+      src: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+      alt: "Competição de surfe adaptado",
+      category: "Eventos",
+    },
     // Adicionar mais fotos conforme necessário
   ]
 
@@ -100,8 +137,8 @@ export default function GalleryPage({ language, setLanguage }: GalleryPageProps)
 
   const filteredPhotos =
     selectedCategory === "all" ? allPhotos : allPhotos.filter((photo) => photo.category === selectedCategory)
-
   const totalPages = Math.ceil(filteredPhotos.length / photosPerPage)
+
   const startIndex = (currentPage - 1) * photosPerPage
   const currentPhotos = filteredPhotos.slice(startIndex, startIndex + photosPerPage)
 
@@ -171,7 +208,7 @@ export default function GalleryPage({ language, setLanguage }: GalleryPageProps)
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
               {currentPhotos.map((photo) => (
-                <div
+                <button
                   key={photo.id}
                   className="relative group cursor-pointer overflow-hidden rounded-lg bg-white shadow-md hover:shadow-xl transition-all duration-300"
                   onClick={() => openModal(photo)}
@@ -188,7 +225,7 @@ export default function GalleryPage({ language, setLanguage }: GalleryPageProps)
                     <p className="text-white text-sm font-medium truncate">{photo.alt}</p>
                     <p className="text-white/80 text-xs">{photo.category}</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
 
@@ -234,28 +271,15 @@ export default function GalleryPage({ language, setLanguage }: GalleryPageProps)
         )}
       </div>
 
-      {/* Modal de Foto */}
       <PhotoModal
-        photo={selectedPhoto}
-        photos={filteredPhotos}
-        onClose={closeModal}
         onNext={nextPhoto}
         onPrev={prevPhoto}
+        onClose={closeModal}
+        photo={selectedPhoto}
+        photos={filteredPhotos}
       />
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center mb-4">
-            <img src="/logo-footer.png" alt="Felipe A Maré Vida" className="w-12 h-12" />
-          </div>
-          <p className="text-gray-400">
-            {language === "pt"
-              ? "© 2024 Felipe A Maré Vida. Transformando vidas através do surfe."
-              : "© 2024 Felipe A Maré Vida. Transforming lives through surfing."}
-          </p>
-        </div>
-      </footer>
+      <Footer language={language} />
     </div>
   )
 }

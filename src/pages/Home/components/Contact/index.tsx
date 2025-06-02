@@ -4,9 +4,10 @@ import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
 import { Input } from "../../../../components/Input"
 import { Button } from "../../../../components/Button"
 import { Textarea } from "../../../../components/TextArea"
+import type { LanguageContent } from "../About/interfaces/content.interface"
 
 interface ContactProps {
-  readonly content: any
+  readonly content: LanguageContent
   readonly language: string
 }
 

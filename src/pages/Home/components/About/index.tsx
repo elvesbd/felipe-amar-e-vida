@@ -1,5 +1,7 @@
+import type { LanguageContent } from "./interfaces/content.interface"
+
 interface AboutProps {
-  readonly content: any
+  readonly content: LanguageContent
 }
 
 export default function About({ content }: AboutProps) {
@@ -10,30 +12,110 @@ export default function About({ content }: AboutProps) {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{content.about.title}</h2>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-          <div className="relative h-105">
-            <img
-              src="/about.jpg"
-              alt="Projeto Felipe A Maré Vida - Surfe Adaptado"
-              className="w-full h-full object-cover rounded-lg"
-            />
+        {/* Primeiro bloco: Sobre o Projeto */}
+        <div className="mb-16">
+          {/* Layout para desktop (1024px+) */}
+          <div className="hidden xl:grid xl:grid-cols-2 xl:gap-12 xl:items-start">
+            <div className="w-full">
+              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+                <img
+                  src="/about.jpg"
+                  alt="Projeto Felipe A Maré Vida - Surfe Adaptado"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className="w-full">
+              <p className="text-gray-600 text-lg leading-relaxed text-justify">{content.about.description}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-gray-600 mb-6 text-lg leading-relaxed text-justify">{content.about.description}</p>
+
+          {/* Layout em L para tablets (768px-1023px) */}
+          <div className="hidden md:block xl:hidden">
+            <div className="float-left mr-6 mb-4 w-1/2 max-w-sm">
+              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+                <img
+                  src="/about.jpg"
+                  alt="Projeto Felipe A Maré Vida - Surfe Adaptado"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className="text-gray-600 text-base md:text-lg leading-relaxed text-justify">
+              {content.about.description}
+            </div>
+            <div className="clear-both"></div>
+          </div>
+
+          {/* Layout em coluna para mobile (<768px) */}
+          <div className="md:hidden">
+            <div className="mb-6">
+              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+                <img
+                  src="/about.jpg"
+                  alt="Projeto Felipe A Maré Vida - Surfe Adaptado"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-gray-600 text-base leading-relaxed text-justify">{content.about.description}</p>
+            </div>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">{content.founder.title}</h3>
-            <p className="text-gray-600 mb-6 text-lg leading-relaxed text-justify">{content.founder.description}</p>
+        {/* Segundo bloco: Fundador */}
+        <div>
+          {/* Layout para desktop (1024px+) */}
+          <div className="hidden xl:grid xl:grid-cols-2 xl:gap-12 xl:items-start">
+            <div className="w-full">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{content.founder.title}</h3>
+              <p className="text-gray-600 text-lg leading-relaxed text-justify">{content.founder.description}</p>
+            </div>
+            <div className="w-full">
+              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+                <img
+                  src="/lg.jpg"
+                  alt="Luiz Gustavo - Fundador do Projeto Felipe A Maré Vida"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </div>
-          <div className="relative h-80">
-            <img
-              src="/lg.jpg"
-              alt="Luiz Gustavo - Fundador do Projeto Felipe A Maré Vida"
-              className="w-full h-full object-cover rounded-lg"
-            />
+
+          {/* Layout em L para tablets (768px-1023px) - Invertido */}
+          <div className="hidden md:block xl:hidden">
+            <div className="float-right ml-6 mb-4 w-1/2 max-w-sm">
+              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+                <img
+                  src="/lg.jpg"
+                  alt="Luiz Gustavo - Fundador do Projeto Felipe A Maré Vida"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className="text-gray-600 text-base md:text-lg leading-relaxed text-justify">
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">{content.founder.title}</h3>
+              {content.founder.description}
+            </div>
+            <div className="clear-both"></div>
+          </div>
+
+          {/* Layout em coluna para mobile (<768px) */}
+          <div className="md:hidden">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">{content.founder.title}</h3>
+            <div className="mb-6">
+              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+                <img
+                  src="/lg.jpg"
+                  alt="Luiz Gustavo - Fundador do Projeto Felipe A Maré Vida"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-gray-600 text-base leading-relaxed text-justify">{content.founder.description}</p>
+            </div>
           </div>
         </div>
       </div>

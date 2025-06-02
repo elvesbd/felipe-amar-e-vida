@@ -4,6 +4,7 @@ import Contact from "./components/Contact"
 import Header from "../../components/Header"
 import Schedule from "./components/Schedule"
 import Footer from "./components/Footer"
+import type { LanguageContent } from "./components/About/interfaces/content.interface"
 
 interface HomePageProps {
   readonly language: "pt" | "en"
@@ -22,7 +23,7 @@ export default function HomePage({ language, setLanguage }: HomePageProps) {
       },
       founder: {
         title: "Idealizador",
-        description: `Luis Gustavo é um profissional dedicado e apaixonado pela educação física, com ampla experiência na área e uma trajetória marcada pelo compromisso com a inclusão e o desenvolvimento humano. Surfista e faixa-preta de jiu-jitsu, ele alia disciplina, ética e perseverança, refletindo esses valores em sua liderança à frente da instituição. Além de suas conquistas ofissionais, Luis é um homem dedicado à família, marido da Dani e pai orgulhoso de Felipe e Mel. Sua postura ética, aliada a um caráter brilhante e inspirador, faz dele uma referência para todos que têm o privilégio de conviver e trabalhar com ele. Sob sua presidência, a instituição avança com foco na transformação social, na valorização das pessoas e na promoção de oportunidades reais para comunidades em situação de vulnerabilidade.`,
+        description: `Luis Gustavo é um profissional dedicado e apaixonado pela educação física, com ampla experiência na área e uma trajetória marcada pelo compromisso com a inclusão e o desenvolvimento humano. Surfista e faixa-preta de jiu-jitsu, ele alia disciplina, ética e perseverança, refletindo esses valores em sua liderança à frente da instituição. Além de suas conquistas profissionais, Luis é um homem dedicado à família, marido da Dani e pai orgulhoso de Felipe e Mel. Sua postura ética, aliada a um caráter brilhante e inspirador, faz dele uma referência para todos que têm o privilégio de conviver e trabalhar com ele. Sob sua presidência, a instituição avança com foco na transformação social, na valorização das pessoas e na promoção de oportunidades reais para comunidades em situação de vulnerabilidade.`,
       },
       schedule: {
         title: "Horários das Aulas",
@@ -81,15 +82,15 @@ export default function HomePage({ language, setLanguage }: HomePageProps) {
     },
   }
 
-  const t = content[language]
+  const langContent: LanguageContent = content[language]
 
   return (
     <div className="min-h-screen bg-white">
       <Header language={language} setLanguage={setLanguage} />
       <Hero />
-      <About content={t} />
-      <Schedule content={t} />
-      <Contact content={t} language={language} />
+      <About content={langContent} />
+      <Schedule content={langContent} />
+      <Contact content={langContent} language={language} />
       <Footer language={language} />
     </div>
   )
