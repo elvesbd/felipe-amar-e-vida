@@ -3,16 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom"
 
 import MobileMenu from "../MobileMenu"
 
-interface HeaderProps {
-  readonly language: "pt" | "en"
-  readonly setLanguage: (lang: "pt" | "en") => void
-}
-
-export default function Header({ language, setLanguage }: HeaderProps) {
+export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
+  const language = i18n.language
+
+  const changeLanguage = (lng: "pt" | "en") => {
+    i18n.changeLanguage(lng)
+  }
 
   const scrollToSection = (sectionId: string) => {
     if (location.pathname !== "/") {
@@ -52,15 +52,14 @@ export default function Header({ language, setLanguage }: HeaderProps) {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3">
-        {/* Layout Desktop */}
         <div className="hidden lg:flex items-center justify-between">
           <button className="flex items-center space-x-3 cursor-pointer p-0" onClick={() => navigate("/")}>
             <div className="flex-shrink-0">
               <img src="/logo-oficial.png" alt="Felipe A Maré Vida" className="w-12 h-12 object-contain" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="text-lg md:text-xl font-bold text-gray-900 leading-tight">Felipe A Maré Vida</span>
-              <span className="text-xs text-gray-600">Surfe Adaptado</span>
+              <span className="text-lg md:text-xl font-bold text-gray-900 leading-tight">{t('project.title')}</span>
+              <span className="text-xs text-gray-600">{t('project.subtitle')}</span>
             </div>
           </button>
 
@@ -99,7 +98,7 @@ export default function Header({ language, setLanguage }: HeaderProps) {
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setLanguage("pt")}
+              onClick={() => changeLanguage("pt")}
               className={`text-xl transition-all duration-200 hover:scale-110 ${language === "pt" ? "opacity-100 scale-110" : "opacity-60"
                 }`}
               title="Português"
@@ -107,7 +106,7 @@ export default function Header({ language, setLanguage }: HeaderProps) {
               🇧🇷
             </button>
             <button
-              onClick={() => setLanguage("en")}
+              onClick={() => changeLanguage("en")}
               className={`text-xl transition-all duration-200 hover:scale-110 ${language === "en" ? "opacity-100 scale-110" : "opacity-60"
                 }`}
               title="English"
@@ -121,20 +120,18 @@ export default function Header({ language, setLanguage }: HeaderProps) {
         <div className="flex lg:hidden items-center justify-between">
           {/* Menu Hamburguer */}
           <div className="flex-shrink-0">
-            <MobileMenu language={language} />
+            <MobileMenu />
           </div>
 
-          {/* Logo Central */}
           <div className="flex-1 flex justify-center">
             <button className="cursor-pointer p-0" onClick={() => navigate("/")}>
               <img src="/logo-oficial.png" alt="Felipe A Maré Vida" className="w-10 h-10 object-contain" />
             </button>
           </div>
 
-          {/* Bandeiras */}
           <div className="flex items-center space-x-2 flex-shrink-0">
             <button
-              onClick={() => setLanguage("pt")}
+              onClick={() => changeLanguage("pt")}
               className={`text-lg transition-all duration-200 hover:scale-110 ${language === "pt" ? "opacity-100 scale-110" : "opacity-60"
                 }`}
               title="Português"
@@ -142,7 +139,7 @@ export default function Header({ language, setLanguage }: HeaderProps) {
               🇧🇷
             </button>
             <button
-              onClick={() => setLanguage("en")}
+              onClick={() => changeLanguage("en")}
               className={`text-lg transition-all duration-200 hover:scale-110 ${language === "en" ? "opacity-100 scale-110" : "opacity-60"
                 }`}
               title="English"

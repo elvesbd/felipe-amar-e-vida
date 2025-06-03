@@ -1,48 +1,16 @@
-"use client"
-
 import { useState } from "react"
-import { LogIn, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
+
 import { Button } from "../Button"
-import { useAuth } from "../../contexts/AuthContext"
+import { useTranslation } from "react-i18next"
 
-interface MobileMenuProps {
-  readonly language: "pt" | "en"
-}
-
-export default function MobileMenu({ language }: MobileMenuProps) {
+export default function MobileMenu() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated, isAdmin } = useAuth()
+  const { t } = useTranslation()
 
   const [isOpen, setIsOpen] = useState(false)
-
-  const content = {
-    pt: {
-      nav: {
-        home: "Início",
-        about: "Sobre",
-        gallery: "Galeria",
-        events: "Eventos",
-        contact: "Contato",
-        admin: "Área Admin",
-        login: "Login",
-      },
-    },
-    en: {
-      nav: {
-        home: "Home",
-        about: "About",
-        gallery: "Gallery",
-        events: "Events",
-        contact: "Contact",
-        admin: "Admin Area",
-        login: "Login",
-      },
-    },
-  }
-
-  const t = content[language]
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -87,11 +55,6 @@ export default function MobileMenu({ language }: MobileMenuProps) {
     navigate("/events")
   }
 
-  const handleAdminClick = () => {
-    setIsOpen(false)
-    navigate("/login")
-  }
-
   return (
     <div className="lg:hidden">
       <Button
@@ -124,44 +87,35 @@ export default function MobileMenu({ language }: MobileMenuProps) {
             onClick={() => scrollToSection("home")}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.home}
+            {t("nav.home")}
           </button>
           <button
             onClick={() => scrollToSection("about")}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.about}
+            {t("nav.about")}
           </button>
           <button
             onClick={handleGalleryClick}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.gallery}
+            {t("nav.gallery")}
           </button>
           <button
             onClick={handleEventsClick}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.events}
+            {t("nav.events")}
           </button>
           <button
             onClick={() => scrollToSection("contact")}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.contact}
+            {t("nav.contact")}
           </button>
 
           {/* Divisor */}
           <div className="border-t my-2"></div>
-
-          {/* Botão Admin/Login */}
-          <button
-            onClick={handleAdminClick}
-            className="py-3 px-4 text-left text-[#63A6DC] hover:bg-gray-100 rounded-md transition-colors flex items-center"
-          >
-            <LogIn className="h-4 w-4 mr-2" />
-            {isAuthenticated && isAdmin ? t.nav.admin : t.nav.login}
-          </button>
         </nav>
 
         <div className="absolute bottom-0 w-full p-4 border-t">

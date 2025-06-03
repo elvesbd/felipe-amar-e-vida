@@ -1,15 +1,13 @@
-import type { LanguageContent } from "./interfaces/content.interface"
+import { useTranslation } from 'react-i18next'
 
-interface AboutProps {
-  readonly content: LanguageContent
-}
+export default function About() {
+  const { t } = useTranslation()
 
-export default function About({ content }: AboutProps) {
   return (
     <section id="about" className="py-24 bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{content.about.title}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t('about.title')}</h2>
         </div>
 
         {/* Primeiro bloco: Sobre o Projeto */}
@@ -26,7 +24,7 @@ export default function About({ content }: AboutProps) {
               </div>
             </div>
             <div className="w-full">
-              <p className="text-gray-600 text-lg leading-relaxed text-justify">{content.about.description}</p>
+              <p className="text-gray-600 text-lg leading-relaxed text-justify">{t('about.description')}</p>
             </div>
           </div>
 
@@ -42,7 +40,7 @@ export default function About({ content }: AboutProps) {
               </div>
             </div>
             <div className="text-gray-600 text-base md:text-lg leading-relaxed text-justify">
-              {content.about.description}
+              {t('about.description')}
             </div>
             <div className="clear-both"></div>
           </div>
@@ -59,7 +57,7 @@ export default function About({ content }: AboutProps) {
               </div>
             </div>
             <div>
-              <p className="text-gray-600 text-base leading-relaxed text-justify">{content.about.description}</p>
+              <p className="text-gray-600 text-base leading-relaxed text-justify">{t('about.description')}</p>
             </div>
           </div>
         </div>
@@ -69,8 +67,8 @@ export default function About({ content }: AboutProps) {
           {/* Layout para desktop (1024px+) */}
           <div className="hidden xl:grid xl:grid-cols-2 xl:gap-12 xl:items-start">
             <div className="w-full">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">{content.founder.title}</h3>
-              <p className="text-gray-600 text-lg leading-relaxed text-justify">{content.founder.description}</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('founder.title')}</h3>
+              <p className="text-gray-600 text-lg leading-relaxed text-justify">{t('founder.description')}</p>
             </div>
             <div className="w-full">
               <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
@@ -95,15 +93,15 @@ export default function About({ content }: AboutProps) {
               </div>
             </div>
             <div className="text-gray-600 text-base md:text-lg leading-relaxed text-justify">
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">{content.founder.title}</h3>
-              {content.founder.description}
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">{t('founder.title')}</h3>
+              {t('founder.description')}
             </div>
             <div className="clear-both"></div>
           </div>
 
           {/* Layout em coluna para mobile (<768px) */}
           <div className="md:hidden">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">{content.founder.title}</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">{t('founder.title')}</h3>
             <div className="mb-6">
               <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
                 <img
@@ -114,7 +112,7 @@ export default function About({ content }: AboutProps) {
               </div>
             </div>
             <div>
-              <p className="text-gray-600 text-base leading-relaxed text-justify">{content.founder.description}</p>
+              <p className="text-gray-600 text-base leading-relaxed text-justify">{t('founder.description')}</p>
             </div>
           </div>
         </div>

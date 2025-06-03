@@ -1,25 +1,21 @@
-"use client"
-
 import { useEffect } from "react"
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "../Button"
 
-interface Photo {
-  id: number
-  src: string
-  alt: string
-  category: string
-}
+import { Button } from "../Button"
+import type { Photo } from "../../pages/Gallery/interfaces/photo.interface"
+import { useTranslation } from "react-i18next"
 
 interface PhotoModalProps {
-  photo: Photo | null
-  photos: Photo[]
-  onClose: () => void
-  onNext: () => void
-  onPrev: () => void
+  readonly photo: Photo | null
+  readonly photos: Photo[]
+  readonly onClose: () => void
+  readonly onNext: () => void
+  readonly onPrev: () => void
 }
 
 export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: PhotoModalProps) {
+  const { t } = useTranslation()
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -45,7 +41,6 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
       <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
-        {/* Close Button */}
         <Button
           variant="ghost"
           size="icon"
@@ -55,7 +50,6 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
           <X className="h-6 w-6" />
         </Button>
 
-        {/* Previous Button */}
         <Button
           variant="ghost"
           size="icon"
@@ -66,7 +60,6 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
           <ChevronLeft className="h-8 w-8" />
         </Button>
 
-        {/* Next Button */}
         <Button
           variant="ghost"
           size="icon"
@@ -77,15 +70,14 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
           <ChevronRight className="h-8 w-8" />
         </Button>
 
-        {/* Image */}
         <div className="relative max-w-full max-h-full">
-          <img src={photo.src || "/placeholder.svg"} alt={photo.alt} className="max-w-full max-h-full object-contain" />
+          <img src={photo.publicUrl || "/placeholder.svg"} alt={photo.altText} className="max-w-full max-h-full object-contain" />
 
           {/* Image Info */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-            <h3 className="text-white text-lg font-semibold mb-1">{photo.alt}</h3>
             <p className="text-white/80 text-sm">
-              {currentIndex + 1} de {photos.length} • {photo.category}
+              {currentIndex + 1} de {photos.length} • {t(`gallery.categories.${photo.category.toLowerCase()}`)}
+
             </p>
           </div>
         </div>
