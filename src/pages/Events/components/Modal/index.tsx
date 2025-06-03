@@ -1,7 +1,7 @@
-"use client"
-
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { X, Calendar, Clock, MapPin } from "lucide-react"
+
 import { Button } from "../../../../components/Button"
 
 interface Event {
@@ -18,24 +18,24 @@ interface Event {
     pt: string
     en: string
   }
-  time: string
-  location: string
-  category: string
-  status: "upcoming" | "ongoing" | "completed"
-  image: string
-  fullDescription?: {
+  category: {
     pt: string
     en: string
   }
+  time: string
+  location: string
+  image: string
 }
 
 interface EventModalProps {
-  event: Event | null
-  onClose: () => void
-  language: "pt" | "en"
+  readonly event: Event | null
+  readonly onClose: () => void
 }
 
-export default function EventModal({ event, onClose, language }: EventModalProps) {
+export default function EventModal({ event, onClose }: EventModalProps) {
+  const { i18n } = useTranslation()
+  const language = i18n.language as "pt" | "en"
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -97,7 +97,7 @@ export default function EventModal({ event, onClose, language }: EventModalProps
 
           <div className="prose max-w-none">
             <p className="text-gray-700 leading-relaxed">
-              {event.fullDescription ? event.fullDescription[language] : event.description[language]}
+              {event.description[language]}
             </p>
           </div>
         </div>

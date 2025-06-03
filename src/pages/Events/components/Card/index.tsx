@@ -1,6 +1,5 @@
-"use client"
-
 import { Calendar, Clock, MapPin } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 interface Event {
   id: number
@@ -16,22 +15,26 @@ interface Event {
     pt: string
     en: string
   }
+  category: {
+    pt: string
+    en: string
+  }
   time: string
   location: string
-  category: string
-  status: "upcoming" | "ongoing" | "completed"
   image: string
 }
 
 interface EventCardProps {
   readonly event: Event
   readonly onClick: (event: Event) => void
-  readonly language: "pt" | "en"
 }
 
-export default function EventCard({ event, onClick, language }: EventCardProps) {
+export default function EventCard({ event, onClick }: EventCardProps) {
+  const { i18n } = useTranslation()
+  const language = i18n.language as "pt" | "en"
+
   return (
-    <div
+    <button
       className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
       onClick={() => onClick(event)}
     >
@@ -48,7 +51,6 @@ export default function EventCard({ event, onClick, language }: EventCardProps) 
           {event.title[language]}
         </h3>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{event.description[language]}</p>
 
         <div className="space-y-2">
           <div className="flex items-center text-sm text-gray-600">
@@ -67,6 +69,6 @@ export default function EventCard({ event, onClick, language }: EventCardProps) 
           </div>
         </div>
       </div>
-    </div>
+    </button>
   )
 }
