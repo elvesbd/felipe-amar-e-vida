@@ -16,14 +16,15 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50">
       <header className="bg-white shadow-sm border-0">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-4 py-4">
+          {/* Layout Desktop - visível apenas em telas md e maiores */}
+          <div className="hidden md:flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <img src="/logo-footer.png" alt="Felipe A Maré Vida" className="h-12 w-12" />
+              <img src="/logo-oficial.png" alt="Felipe A Maré Vida" className="w-12 h-12 object-contain" />
 
-              <div>
-                <h1 className="text-md font-bold text-gray-900">Painel Administrativo</h1>
-                <p className="text-gray-600">Bem-vindo, {user?.name}!</p>
+              <div className="flex flex-col items-start">
+                <span className="text-lg md:text-xl font-bold text-gray-900 leading-tight">Painel Administrativo</span>
+                <span className="text-xs text-gray-600">Bem-vindo, {user?.name}!</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -41,6 +42,31 @@ export default function AdminDashboard() {
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
+              </Button>
+            </div>
+          </div>
+
+          {/* Layout Mobile - simplificado para telas menores */}
+          <div className="flex md:hidden items-center">
+            {/* Logo */}
+            <img src="/logo-oficial.png" alt="Felipe A Maré Vida" className="w-12 h-12 object-contain" />
+
+            {/* Textos alinhados com a logo */}
+            <div className="flex flex-col items-start ml-4 flex-1">
+              <span className="text-lg font-bold text-gray-900 leading-tight">Painel Administrativo</span>
+              <span className="text-xs text-gray-600">Bem-vindo, {user?.name}!</span>
+            </div>
+
+            {/* Botões de ação */}
+            <div className="flex items-center space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="w-8 h-8 p-0 flex items-center justify-center text-gray-600"
+                title="Sair"
+              >
+                <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>
