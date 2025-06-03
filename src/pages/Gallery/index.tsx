@@ -12,12 +12,7 @@ import { Button } from "../../components/Button"
 import PhotoModal from "../../components/PhotoModal"
 import type { Photo } from "./interfaces/photo.interface"
 
-interface GalleryPageProps {
-  readonly language: "pt" | "en"
-  readonly setLanguage: (lang: "pt" | "en") => void
-}
-
-export default function GalleryPage({ language, setLanguage }: GalleryPageProps) {
+export default function GalleryPage() {
   const photosPerPage = 12
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -146,7 +141,7 @@ export default function GalleryPage({ language, setLanguage }: GalleryPageProps)
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header language={language} setLanguage={setLanguage} />
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header da Galeria */}
@@ -252,7 +247,7 @@ export default function GalleryPage({ language, setLanguage }: GalleryPageProps)
         photos={filteredPhotos}
       />
 
-      <Footer language={language} />
+      <Footer />
     </div>
   )
 }
