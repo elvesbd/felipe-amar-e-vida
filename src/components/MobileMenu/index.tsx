@@ -1,41 +1,16 @@
-"use client"
-
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
+
 import { Button } from "../Button"
+import { useTranslation } from "react-i18next"
 
-interface MobileMenuProps {
-  language: "pt" | "en"
-}
-
-export default function MobileMenu({ language }: MobileMenuProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export default function MobileMenu() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useTranslation()
 
-  const content = {
-    pt: {
-      nav: {
-        home: "Início",
-        about: "Sobre",
-        gallery: "Galeria",
-        events: "Eventos",
-        contact: "Contato",
-      },
-    },
-    en: {
-      nav: {
-        home: "Home",
-        about: "About",
-        gallery: "Gallery",
-        events: "Events",
-        contact: "Contact",
-      },
-    },
-  }
-
-  const t = content[language]
+  const [isOpen, setIsOpen] = useState(false)
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -97,7 +72,7 @@ export default function MobileMenu({ language }: MobileMenuProps) {
 
       {/* Menu Móvel */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="flex justify-between items-center p-4 border-b">
@@ -112,32 +87,35 @@ export default function MobileMenu({ language }: MobileMenuProps) {
             onClick={() => scrollToSection("home")}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.home}
+            {t("nav.home")}
           </button>
           <button
             onClick={() => scrollToSection("about")}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.about}
+            {t("nav.about")}
           </button>
           <button
             onClick={handleGalleryClick}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.gallery}
+            {t("nav.gallery")}
           </button>
           <button
             onClick={handleEventsClick}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.events}
+            {t("nav.events")}
           </button>
           <button
             onClick={() => scrollToSection("contact")}
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
-            {t.nav.contact}
+            {t("nav.contact")}
           </button>
+
+          {/* Divisor */}
+          <div className="border-t my-2"></div>
         </nav>
 
         <div className="absolute bottom-0 w-full p-4 border-t">
