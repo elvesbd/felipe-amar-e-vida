@@ -96,7 +96,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
           </div>
 
           <div className="prose max-w-none">
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-700 leading-relaxed text-justify">
               {event.description[language]}
             </p>
           </div>
