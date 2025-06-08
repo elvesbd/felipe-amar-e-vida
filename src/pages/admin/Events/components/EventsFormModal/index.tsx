@@ -54,8 +54,6 @@ export default function EventFormModal({ isOpen, onClose, onSubmit, event }: Eve
   // Pré-preencher formulário quando em modo de edição
   useEffect(() => {
     if (event) {
-      console.log({ event });
-
       setFormData({
         title: event.pt.title,
         description: event.pt.description,
