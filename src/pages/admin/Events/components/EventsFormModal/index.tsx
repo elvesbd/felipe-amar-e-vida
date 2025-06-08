@@ -1,133 +1,229 @@
-import { z } from "zod"
-import { useEffect, useState } from "react"
-import { X, Upload, Calendar, Clock, MapPin, FileText, ImageIcon } from "lucide-react"
+"use client"
 
-import { Label } from "../../../../../components/Label"
-import { Input } from "../../../../../components/Input"
-import { Button } from "../../../../../components/Button"
-import { Textarea } from "../../../../../components/TextArea"
+import type React from "react"
+import { ptBR } from "date-fns/locale"
+import { useState, useEffect } from "react"
+import DatePicker, { registerLocale } from "react-datepicker"
+import { X, Upload, Calendar, Clock, ImageIcon } from "lucide-react"
+import "react-datepicker/dist/react-datepicker.css"
+import { validateEventForm } from "./validation/event-form.validation"
+import { MapPin } from "lucide-react"
+import { getPreSignedUrl } from "../../../../../services/s3/getPresignedURL"
+import { uploadToS3 } from "../../../../../services/s3/upload"
+import type { Event } from "../.."
+import { parseISO } from "date-fns"
 
-interface Event {
-  id: number
-  title: string
-  description: string
-  date: string
-  time: string
-  location: string
-  image: string
-}
-
-const eventSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Título é obrigatório")
-    .min(5, "Título deve ter pelo menos 5 caracteres")
-    .max(100, "Título deve ter no máximo 100 caracteres"),
-  description: z
-    .string()
-    .min(1, "Descrição é obrigatória")
-    .min(10, "Descrição deve ter pelo menos 10 caracteres")
-    .max(300, "Descrição deve ter no máximo 300 caracteres"),
-  date: z.string().min(1, "Data é obrigatória"),
-  time: z
-    .string()
-    .min(1, "Horário é obrigatório")
-    .regex(/^([0-1]?[0-9]|2[0-3])h[0-5][0-9]/, "Formato de horário inválido (ex: 14h30)"),
-  location: z
-    .string()
-    .min(1, "Local é obrigatório")
-    .min(5, "Local deve ter pelo menos 5 caracteres")
-    .max(150, "Local deve ter no máximo 150 caracteres"),
-  category: z.string().min(1, "Categoria é obrigatória"),
-  image: z.instanceof(File).optional().refine((file) => file instanceof File, {
-    message: "Imagem é obrigatória"
-  }),
-})
-
-type EventFormData = z.infer<typeof eventSchema>
+// Registrar o locale pt-BR
+registerLocale("pt-BR", ptBR)
 
 interface EventFormModalProps {
-  readonly isOpen: boolean
-  readonly onClose: () => void
-  readonly onSubmit: (data: EventFormData) => void
-  readonly event?: Event | null
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (data: any) => void
+  event?: Event | null
+}
+
+interface EventFormData {
+  title: string
+  description: string
+  fullDescription: string
+  location: string
+  startTime: string
+  endTime: string
+  image?: File
 }
 
 export default function EventFormModal({ isOpen, onClose, onSubmit, event }: EventFormModalProps) {
   const isEditing = !!event
-  const [formData, setFormData] = useState<Partial<EventFormData>>({
+  const TIMEZONE = "America/Fortaleza"
+
+  const [formData, setFormData] = useState<EventFormData>({
     title: "",
     description: "",
-    date: "",
-    time: "",
+    fullDescription: "",
     location: "",
-    category: "",
+    startTime: "",
+    endTime: "",
   })
-  const [loading, setLoading] = useState(false)
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [errors, setErrors] = useState<Partial<Record<keyof EventFormData, string>>>({})
 
-  const handleInputChange = (field: keyof EventFormData, value: string | File) => {
+  // Pré-preencher formulário quando em modo de edição
+  useEffect(() => {
+    if (event) {
+      setFormData({
+        title: event.pt.title,
+        description: event.pt.description,
+        fullDescription: event.pt.fullDescription ?? "",
+        location: event.pt.location,
+        startTime: event.startTime,
+        endTime: event.endTime,
+      })
+      setImagePreview(event.image)
+      const eventDate = parseISO(event.isoDate)
+      setSelectedDate(eventDate)
+    } else {
+      setFormData({
+        title: "",
+        description: "",
+        fullDescription: "",
+        location: "",
+        startTime: "",
+        endTime: "",
+      })
+      setImagePreview(null)
+      setSelectedDate(null)
+    }
+  }, [event])
+
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date)
+    if (date && errors.date) {
+      setErrors((prev) => ({ ...prev, date: "" }))
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }))
+    }
+  }
+
+  const handleTimeChange = (field: "startTime" | "endTime", value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-
-    // Limpar erro do campo quando o usuário começar a digitar
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }))
+    if (errors.startTime || errors.endTime) {
+      setErrors((prev) => ({ ...prev, startTime: "", endTime: "" }))
     }
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      handleInputChange("image", file)
+      if (!file.type.startsWith("image/")) {
+        setErrors((prev) => ({ ...prev, image: "Por favor, selecione apenas arquivos de imagem." }))
+        return
+      }
 
-      // Criar preview da imagem
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, image: "A imagem deve ter no máximo 5MB." }))
+        return
+      }
+
+      setFormData((prev) => ({ ...prev, image: file }))
+
       const reader = new FileReader()
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string)
       }
       reader.readAsDataURL(file)
+
+      if (errors.image) {
+        setErrors((prev) => ({ ...prev, image: "" }))
+      }
     }
   }
 
-  const validateForm = (): boolean => {
-    try {
-      eventSchema.parse(formData)
-      setErrors({})
-      return true
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: Partial<Record<keyof EventFormData, string>> = {}
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            fieldErrors[err.path[0] as keyof EventFormData] = err.message
-          }
-        })
-        setErrors(fieldErrors)
-      }
-      return false
-    }
+  const removeImage = () => {
+    setFormData((prev) => ({ ...prev, image: undefined }))
+    setImagePreview(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateForm()) {
+    // Validar horários
+    const timeErrors: Record<string, string> = {}
+
+    if (!formData.startTime) {
+      timeErrors.startTime = "Horário de início é obrigatório"
+    }
+
+    if (!formData.endTime) {
+      timeErrors.endTime = "Horário de fim é obrigatório"
+    }
+
+    // Verificar se horário de fim é depois do início
+    if (formData.startTime && formData.endTime) {
+      const [startHour, startMin] = formData.startTime.split(":").map(Number)
+      const [endHour, endMin] = formData.endTime.split(":").map(Number)
+
+      const startMinutes = startHour * 60 + startMin
+      const endMinutes = endHour * 60 + endMin
+
+      if (endMinutes <= startMinutes) {
+        timeErrors.endTime = "Horário de fim deve ser posterior ao início"
+      }
+    }
+
+    // Criar um objeto de dados para validação
+    const dataToValidate = {
+      ...formData,
+      // Consideramos que há uma data se selectedDate não for nulo
+      date: selectedDate ? "valid-date" : "",
+      // Para validação, criamos um time combinado
+      time: formData.startTime && formData.endTime ? `${formData.startTime} - ${formData.endTime}` : "",
+    }
+
+    // Usar a função de validação existente
+    const validationErrors = { ...validateEventForm(dataToValidate), ...timeErrors }
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      console.log("Validation errors:", validationErrors)
       return
     }
 
-    setLoading(true)
+    setIsSubmitting(true)
+    setErrors({})
 
     try {
-      // Simular delay de API
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      let publicUrl: string | undefined = undefined
 
-      onSubmit(formData as EventFormData)
+      // Se tiver uma nova imagem, fazer upload para o S3
+      if (formData.image) {
+        console.log("Uploading image...")
+        const { signedURL, publicURL } = await getPreSignedUrl(formData.image)
+        await uploadToS3(signedURL, formData.image)
+        publicUrl = publicURL
+        console.log("Image uploaded successfully to S3")
+      }
+
+      // Preparar dados do evento no formato esperado (com pt e en)
+      const eventData = {
+        id: event?.id,
+        image: publicUrl || event?.image,
+        isoDate: selectedDate ? selectedDate.toISOString() : null,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        timezone: TIMEZONE,
+        pt: {
+          title: formData.title,
+          description: formData.description,
+          fullDescription: formData.fullDescription || undefined,
+          location: formData.location,
+        },
+        en: event?.en || {
+          // Manter dados em inglês se estiver editando, ou usar os mesmos do português
+          title: formData.title,
+          description: formData.description,
+          fullDescription: formData.fullDescription || undefined,
+          location: formData.location,
+        },
+      }
+
+      console.log("Event data prepared:", eventData)
+      onSubmit(eventData)
       handleClose()
+      console.log(`Event ${isEditing ? "updated" : "created"} successfully`)
     } catch (error) {
-      console.error("Erro ao criar evento:", error)
+      console.error(`Error ${isEditing ? "updating" : "creating"} event:`, error)
+      setErrors({ submit: `Erro ao ${isEditing ? "atualizar" : "criar"} evento. Tente novamente.` })
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
 
@@ -135,216 +231,264 @@ export default function EventFormModal({ isOpen, onClose, onSubmit, event }: Eve
     setFormData({
       title: "",
       description: "",
-      date: "",
-      time: "",
+      fullDescription: "",
       location: "",
-      category: "",
+      startTime: "",
+      endTime: "",
     })
     setErrors({})
     setImagePreview(null)
+    setSelectedDate(null)
     onClose()
   }
-
-  // Pré-preencher formulário quando em modo de edição
-  useEffect(() => {
-    if (event) {
-      setFormData({
-        title: event.title,
-        description: event.description,
-        date: event.date,
-        time: event.time,
-        location: event.location,
-      })
-      setImagePreview(event.image)
-    } else {
-      setFormData({
-        title: "",
-        description: "",
-        date: "",
-        time: "",
-        location: "",
-      })
-      setImagePreview(null)
-    }
-  }, [event])
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-0">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <div>
-            <p className="text-gray-600">
-              {isEditing ? "Atualize as informações do evento" : "Preencha as informações do evento"}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-end p-6">
+          <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            disabled={isSubmitting}
           >
-            <X className="h-5 w-5" />
-          </Button>
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        {/* Formulário */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Título */}
-          <div className="space-y-2">
-            <Label htmlFor="title" className="text-sm font-medium text-gray-700 flex items-center">
-              <FileText className="h-4 w-4 mr-2 text-[#63A6DC]" />
-              Título do Evento
-            </Label>
-            <Input
+          {/* Title */}
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              Título do Evento *
+            </label>
+            <input
+              type="text"
               id="title"
-              value={formData.title || ""}
-              onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Ex: Workshop de Surfe Adaptado"
-              className={`bg-gray-50 border-0 focus:ring-2 focus:ring-[#63A6DC] transition-all duration-200 ${errors.title ? "ring-2 ring-red-500" : ""
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.title ? "border-red-500" : "border-gray-300"
                 }`}
+              placeholder="Digite o título do evento"
+              disabled={isSubmitting}
             />
-            {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
+            {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
           </div>
 
-          {/* Descrição */}
-          <div className="space-y-2">
-            <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-              Descrição Resumida
-            </Label>
-            <Textarea
+          {/* Description */}
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+              Descrição Resumida *
+            </label>
+            <textarea
               id="description"
-              value={formData.description || ""}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Descrição breve que aparecerá nos cards do evento..."
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
               rows={3}
-              className={`bg-gray-50 border-0 focus:ring-2 focus:ring-[#63A6DC] transition-all duration-200 resize-none ${errors.description ? "ring-2 ring-red-500" : ""
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.description ? "border-red-500" : "border-gray-300"
                 }`}
+              placeholder="Descrição breve que aparecerá nos cards do evento"
+              disabled={isSubmitting}
             />
-            {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
           </div>
 
-          {/* Data e Horário */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-sm font-medium text-gray-700 flex items-center">
-                <Calendar className="h-4 w-4 mr-2 text-[#63A6DC]" />
-                Data
-              </Label>
-              <Input
-                id="date"
-                value={formData.date || ""}
-                onChange={(e) => handleInputChange("date", e.target.value)}
-                placeholder="Ex: 15 de Janeiro, 2024"
-                className={`bg-gray-50 border-0 focus:ring-2 focus:ring-[#63A6DC] transition-all duration-200 ${errors.date ? "ring-2 ring-red-500" : ""
-                  }`}
-              />
-              {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="time" className="text-sm font-medium text-gray-700 flex items-center">
-                <Clock className="h-4 w-4 mr-2 text-[#63A6DC]" />
-                Horário
-              </Label>
-              <Input
-                id="time"
-                value={formData.time || ""}
-                onChange={(e) => handleInputChange("time", e.target.value)}
-                placeholder="Ex: 14h45 - 17h00"
-                className={`bg-gray-50 border-0 focus:ring-2 focus:ring-[#63A6DC] transition-all duration-200 ${errors.time ? "ring-2 ring-red-500" : ""
-                  }`}
-              />
-              {errors.time && <p className="text-red-500 text-sm">{errors.time}</p>}
-            </div>
+          {/* Full Description */}
+          <div>
+            <label htmlFor="fullDescription" className="block text-sm font-medium text-gray-700 mb-2">
+              Descrição Completa (Opcional)
+            </label>
+            <textarea
+              id="fullDescription"
+              name="fullDescription"
+              value={formData.fullDescription}
+              onChange={handleInputChange}
+              rows={4}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.fullDescription ? "border-red-500" : "border-gray-300"
+                }`}
+              placeholder="Descrição detalhada que aparecerá no modal do evento"
+              disabled={isSubmitting}
+            />
+            {errors.fullDescription && <p className="mt-1 text-sm text-red-600">{errors.fullDescription}</p>}
           </div>
 
-          {/* Local */}
-          <div className="space-y-2">
-            <Label htmlFor="location" className="text-sm font-medium text-gray-700 flex items-center">
-              <MapPin className="h-4 w-4 mr-2 text-[#63A6DC]" />
-              Local
-            </Label>
-            <Input
+          {/* Date */}
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
+              <Calendar className="w-4 h-4 inline mr-1" />
+              Data *
+            </label>
+            <div className={`${errors.date ? "border-red-500 rounded-md" : ""}`}>
+              <DatePicker
+                selected={selectedDate}
+                onChange={handleDateChange}
+                locale="pt-BR"
+                dateFormat="dd/MM/yyyy"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.date ? "border-red-500" : "border-gray-300"
+                  }`}
+                placeholderText="Selecione uma data"
+                disabled={isSubmitting}
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                isClearable
+              />
+            </div>
+            {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
+          </div>
+
+          {/* Time Range */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Clock className="w-4 h-4 inline mr-1" />
+              Horário *
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="startTime" className="block text-xs text-gray-500 mb-1">
+                  Início
+                </label>
+                <input
+                  type="time"
+                  id="startTime"
+                  value={formData.startTime}
+                  onChange={(e) => handleTimeChange("startTime", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.startTime ? "border-red-500" : "border-gray-300"
+                    }`}
+                  disabled={isSubmitting}
+                />
+                {errors.startTime && <p className="mt-1 text-xs text-red-600">{errors.startTime}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="endTime" className="block text-xs text-gray-500 mb-1">
+                  Fim
+                </label>
+                <input
+                  type="time"
+                  id="endTime"
+                  value={formData.endTime}
+                  onChange={(e) => handleTimeChange("endTime", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.endTime ? "border-red-500" : "border-gray-300"
+                    }`}
+                  disabled={isSubmitting}
+                />
+                {errors.endTime && <p className="mt-1 text-xs text-red-600">{errors.endTime}</p>}
+              </div>
+            </div>
+
+            {/* Preview do horário */}
+            {formData.startTime && formData.endTime && (
+              <div className="mt-2 text-sm text-gray-600">
+                Horário: {formData.startTime.replace(":", "h")} - {formData.endTime.replace(":", "h")}
+              </div>
+            )}
+          </div>
+
+          {/* Location */}
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+              <MapPin className="w-4 h-4 inline mr-1" />
+              Local *
+            </label>
+            <input
+              type="text"
               id="location"
-              value={formData.location || ""}
-              onChange={(e) => handleInputChange("location", e.target.value)}
-              placeholder="Ex: PF Surf School - Praia do Futuro"
-              className={`bg-gray-50 border-0 focus:ring-2 focus:ring-[#63A6DC] transition-all duration-200 ${errors.location ? "ring-2 ring-red-500" : ""
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.location ? "border-red-500" : "border-gray-300"
                 }`}
+              placeholder="Ex: PF Surf School - Praia do Futuro"
+              disabled={isSubmitting}
             />
-            {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
+            {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
           </div>
 
-          {/* Upload de Imagem */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700 flex items-center">
-              <ImageIcon className="h-4 w-4 mr-2 text-[#63A6DC]" />
-              Imagem do Evento
-            </Label>
-            <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-[#63A6DC] transition-colors duration-200">
-              {imagePreview ? (
-                <div className="space-y-4">
-                  <img src={imagePreview || "/placeholder.svg"} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setImagePreview(null)
-                      setFormData((prev) => ({ ...prev, image: undefined }))
-                    }}
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    Remover Imagem
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <Upload className="h-12 w-12 text-gray-400 mx-auto" />
-                  <div>
-                    <p className="text-gray-600 mb-2">Clique para selecionar uma imagem</p>
-                    <p className="text-sm text-gray-400">PNG, JPG ou JPEG até 5MB</p>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <ImageIcon className="w-4 h-4 inline mr-1" />
+              Imagem do Evento {!isEditing && "*"}
+            </label>
+
+            {!imagePreview ? (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  id="image-upload"
+                  disabled={isSubmitting}
+                />
+                <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center">
+                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-600">
+                    {isEditing ? "Clique para alterar a imagem" : "Clique para selecionar uma imagem"}
+                  </span>
+                  <span className="text-xs text-gray-500 mt-1">PNG, JPG até 5MB</span>
+                </label>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="relative">
+                  <img
+                    src={imagePreview || "/placeholder.svg"}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-lg"
                   />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                    disabled={isSubmitting}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-              )}
-            </div>
-            {errors.image && <p className="text-red-500 text-sm">{errors.image}</p>}
+              </div>
+            )}
+
+            {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
           </div>
 
-          {/* Botões */}
-          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-100">
-            <Button
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-3">
+              <p className="text-sm text-red-600">{errors.submit}</p>
+            </div>
+          )}
+
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
               type="button"
-              variant="outline"
               onClick={handleClose}
-              className="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200"
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+              disabled={isSubmitting}
             >
               Cancelar
-            </Button>
-            <Button
+            </button>
+            <button
               type="submit"
-              disabled={loading}
-              className="px-6 py-2 bg-[#63A6DC] hover:bg-[#4a8bc4] text-white shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
             >
-              {loading ? (
-                <div className="flex items-center">
+              {isSubmitting ? (
+                <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   {isEditing ? "Salvando..." : "Criando..."}
-                </div>
+                </>
               ) : isEditing ? (
                 "Salvar Alterações"
               ) : (
                 "Criar Evento"
               )}
-            </Button>
+            </button>
           </div>
         </form>
       </div>

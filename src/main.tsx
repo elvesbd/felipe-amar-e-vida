@@ -5,6 +5,7 @@ import App from "./App.tsx"
 import "./index.css"
 import { AuthProvider } from "./contexts/AuthContext.tsx"
 import "./i18n.ts"
+import "./styles/datepicker-custom.css"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

@@ -2,20 +2,12 @@ import { z } from "zod"
 import { useState } from "react"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import { useNavigate, Navigate } from "react-router-dom"
-import { useAuth } from "../../contexts/AuthContext"
-import { Button } from "../../components/Button"
+
+import { useAuth } from "../../hooks/useAuth"
 import { Label } from "../../components/Label"
 import { Input } from "../../components/Input"
-
-const loginSchema = z.object({
-  email: z.string().min(1, "E-mail é obrigatório").email("E-mail deve ter um formato válido"),
-  password: z
-    .string()
-    .min(6, "Senha deve ter pelo menos 6 caracteres")
-    .max(50, "Senha deve ter no máximo 50 caracteres"),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
+import { Button } from "../../components/Button"
+import { loginSchema, type LoginFormData } from "./validation/login.schema"
 
 export default function LoginPage() {
   const navigate = useNavigate()

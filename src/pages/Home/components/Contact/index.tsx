@@ -10,8 +10,8 @@ export default function Contact() {
   const { t } = useTranslation()
 
   return (
-    <section id="contact" className="py-16 bg-white">
-      <div className="container mx-auto px-4">
+    <section id="contact" className="py-16 bg-white w-full min-h-screen flex items-center">
+      <div className="container mx-auto px-4 max-w-full">
         <div className="grid md:grid-cols-2 gap-12">
           <div className="flex flex-col justify-between">
             <div className="space-y-6">

@@ -1,24 +1,33 @@
-"use client"
-
 import { useState } from "react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Plus, Edit, Trash2, Calendar, Clock, MapPin, Search } from "lucide-react"
-import { Button } from "../../../components/Button"
+
 import { Input } from "../../../components/Input"
+import { Button } from "../../../components/Button"
 import EventFormModal from "./components/EventsFormModal"
 
-interface Event {
-  id: number
+interface TranslatedFields {
   title: string
   description: string
-  date: string
-  time: string
-  location: string
-  image: string
   fullDescription?: string
+  location: string
+}
+
+export interface Event {
+  id: number | string
+  image: string
+  isoDate: string
+  startTime: string
+  endTime: string
+  timezone: string
+  pt: TranslatedFields
+  en: TranslatedFields
 }
 
 export default function AdminEvents() {
+  const currentLang = 'pt'
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -27,85 +36,44 @@ export default function AdminEvents() {
   // Dados de exemplo - substituir pela API real
   const [events] = useState<Event[]>([
     {
-      id: 1,
-      title: "Aula Especial de Surfe Adaptado",
-      description:
-        "Aula especial com foco em técnicas avançadas de surfe adaptado para pessoas com deficiência visual.",
-      fullDescription:
-        "Esta aula especial será dedicada ao desenvolvimento de técnicas avançadas de surfe adaptado, com foco especial em pessoas com deficiência visual.",
-      date: "15 de Janeiro, 2024",
-      time: "14h45 - 17h00",
-      location: "PF Surf School - Praia do Futuro",
-      image:
-        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-    },
-    {
-      id: 2,
-      title: "Workshop de Conscientização Ambiental",
-      description: "Workshop sobre preservação marinha e sustentabilidade nas práticas esportivas.",
-      fullDescription:
-        "Um workshop completo sobre a importância da preservação do meio ambiente marinho e como podemos contribuir através de práticas esportivas sustentáveis.",
-      date: "22 de Janeiro, 2024",
-      time: "09h00 - 12h00",
-      location: "Centro Comunitário - Vicente Pinzon",
-      image:
-        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-    },
-    {
-      id: 3,
-      title: "Competição de Surfe Adaptado",
-      description: "Primeira competição oficial de surfe adaptado do projeto Felipe A Maré Vida.",
-      fullDescription:
-        "Nossa primeira competição oficial de surfe adaptado! Um evento histórico que celebra os avanços e conquistas de nossos alunos.",
-      date: "10 de Dezembro, 2023",
-      time: "08h00 - 16h00",
-      location: "Praia do Futuro - Fortaleza",
-      image:
-        "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-    },
-    {
-      id: 4,
-      title: "Evento Comunitário de Integração",
-      description: "Encontro para integração entre alunos, familiares e voluntários do projeto.",
-      fullDescription:
-        "Um dia especial dedicado à integração de toda nossa comunidade. Teremos atividades recreativas, apresentações dos alunos, depoimentos inspiradores e um delicioso almoço comunitário.",
-      date: "05 de Fevereiro, 2024",
-      time: "10h00 - 16h00",
-      location: "PF Surf School - Praia do Futuro",
-      image:
-        "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-    },
-    {
-      id: 5,
-      title: "Workshop de Primeiros Socorros",
-      description: "Capacitação em primeiros socorros para voluntários e instrutores.",
-      fullDescription:
-        "Workshop essencial para capacitar nossos voluntários e instrutores em técnicas de primeiros socorros específicas para atividades aquáticas e esportivas adaptadas.",
-      date: "28 de Janeiro, 2024",
-      time: "13h00 - 17h00",
-      location: "Sede do Projeto - Vicente Pinzon",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-    },
+      id: "1",
+      isoDate: "2025-06-23T03:00:00.000Z", // formato ISO sugerido, você pode adaptar
+      startTime: "14:45",
+      endTime: "17:00",
+      timezone: "America/Fortaleza", // ou outro fuso horário aplicável
+      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+      pt: {
+        title: "Aula Especial de Surfe Adaptado",
+        description: "Aula especial com foco em técnicas avançadas de surfe adaptado para pessoas com deficiência visual.",
+        fullDescription: "Esta aula especial será dedicada ao desenvolvimento de técnicas avançadas de surfe adaptado, com foco especial em pessoas com deficiência visual.",
+        location: "PF Surf School - Praia do Futuro"
+      },
+      en: {
+        title: "Special Adaptive Surfing Class",
+        description: "Special class focusing on advanced adaptive surfing techniques for people with visual impairments.",
+        fullDescription: "This special class will be dedicated to the development of advanced adaptive surfing techniques, with a special focus on people with visual impairments.",
+        location: "PF Surf School - Praia do Futuro"
+      }
+    }
   ])
 
   const filteredEvents = events.filter((event) => {
+    const content = event[currentLang]
     const matchesSearch =
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase())
+      content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      content.description.toLowerCase().includes(searchTerm.toLowerCase())
     return matchesSearch
   })
 
+
   const handleEdit = (event: Event) => {
-    // Implementar edição
-    console.log("Editar evento:", event.id)
     setEditingEvent(event)
     setIsModalOpen(true)
   }
 
   const handleDelete = (event: Event) => {
     // Implementar exclusão com confirmação
-    if (window.confirm(`Tem certeza que deseja excluir o evento "${event.title}"?`)) {
+    if (window.confirm(`Tem certeza que deseja excluir o evento "${event[currentLang].title}"?`)) {
       console.log("Excluir evento:", event.id)
     }
   }
@@ -226,7 +194,7 @@ export default function AdminEvents() {
                   <div className="md:w-64 h-48 md:h-auto">
                     <img
                       src={event.image || "/placeholder.svg"}
-                      alt={event.title}
+                      alt={event[currentLang].title}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -234,21 +202,23 @@ export default function AdminEvents() {
                   <div className="flex-1 p-4 md:p-6">
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                       <div className="flex-1 mb-4 md:mb-0">
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
-                        <p className="text-gray-600 mb-4 text-sm md:text-base line-clamp-2">{event.description}</p>
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{event[currentLang].title}</h3>
+                        <p className="text-gray-600 mb-4 text-sm md:text-base line-clamp-2">{event[currentLang].description}</p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 mb-4">
                           <div className="flex items-center text-xs md:text-sm text-gray-600">
                             <Calendar className="h-3 md:h-4 w-3 md:w-4 mr-2 text-[#63A6DC] flex-shrink-0" />
-                            <span className="truncate">{event.date}</span>
+                            {format(new Date(event.isoDate), "dd 'de' MMMM',' yyyy", { locale: ptBR })}
                           </div>
                           <div className="flex items-center text-xs md:text-sm text-gray-600">
                             <Clock className="h-3 md:h-4 w-3 md:w-4 mr-2 text-[#63A6DC] flex-shrink-0" />
-                            <span>{event.time}</span>
+                            <span>
+                              {event.startTime.replace(':', 'h')} - {event.endTime.replace(':', 'h')}
+                            </span>
                           </div>
                           <div className="flex items-center text-xs md:text-sm text-gray-600">
                             <MapPin className="h-3 md:h-4 w-3 md:w-4 mr-2 text-[#63A6DC] flex-shrink-0" />
-                            <span className="truncate">{event.location}</span>
+                            <span className="truncate">{event[currentLang].location}</span>
                           </div>
                         </div>
                       </div>
@@ -283,10 +253,10 @@ export default function AdminEvents() {
       </main>
 
       <EventFormModal
+        event={editingEvent}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleCreateEvent}
-        event={editingEvent}
       />
     </div>
   )
