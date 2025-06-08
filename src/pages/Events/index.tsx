@@ -72,7 +72,7 @@ export default function EventsPage() {
       },
       image:
         "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-    },
+    }
   ]
 
   const totalPages = Math.ceil(allEvents.length / eventsPerPage)
@@ -88,64 +88,66 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen">
       <Header />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 text-[#63A6DC] hover:text-[#4a8bc4]">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("eventsPage.backToHome")}
-          </Button>
-        </div>
-
-        {currentEvents.length > 0 ? (
-          <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {currentEvents.map((event) => (
-                <EventCard key={event.id} event={event} onClick={openModal} />
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  {t("eventsPage.previous")}
-                </Button>
-
-                <div className="flex space-x-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
-                      className={currentPage === page ? "bg-[#63A6DC] hover:bg-[#4a8bc4]" : ""}
-                    >
-                      {page}
-                    </Button>
-                  ))}
-                </div>
-
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  {t("eventsPage.next")}
-                </Button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-16">
-            <p className="text-gray-500 text-lg">{t("eventsPage.noEvents")}</p>
+      <div className="flex-grow">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 text-[#63A6DC] hover:text-[#4a8bc4]">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t("eventsPage.backToHome")}
+            </Button>
           </div>
-        )}
+
+          {currentEvents.length > 0 ? (
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {currentEvents.map((event) => (
+                  <EventCard key={event.id} event={event} onClick={openModal} />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    {t("eventsPage.previous")}
+                  </Button>
+
+                  <div className="flex space-x-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={currentPage === page ? "bg-[#63A6DC] hover:bg-[#4a8bc4]" : ""}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    {t("eventsPage.next")}
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-gray-500 text-lg">{t("eventsPage.noEvents")}</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <EventModal event={selectedEvent} onClose={closeModal} />

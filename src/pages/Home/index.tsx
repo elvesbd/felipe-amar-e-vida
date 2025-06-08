@@ -7,12 +7,14 @@ import Schedule from "./components/Schedule"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      <Hero />
-      <About />
-      <Schedule />
-      <Contact />
+      <div className="flex-1 flex flex-col">
+        <Hero />
+        <About />
+        <Schedule />
+        <Contact />
+      </div>
       <Footer />
     </div>
   )

@@ -33,7 +33,7 @@ export default function Hero() {
   }
 
   return (
-    <section id="home" className="relative h-[600px] overflow-hidden">
+    <section id="home" className="relative h-[638px] overflow-hidden">
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
           <div
