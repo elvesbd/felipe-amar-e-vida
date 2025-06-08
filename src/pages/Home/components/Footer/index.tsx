@@ -4,7 +4,7 @@ export default function Footer() {
   const { t } = useTranslation()
 
   return (
-    <footer className="bg-gray-900 text-white py-8">
+    <footer className="bg-gray-900 text-white py-8 mt-auto">
       <div className="container mx-auto px-4 text-center">
         <div className="flex items-center justify-center mb-4">
           <img src="/logo-footer.png" alt="Felipe A Maré Vida" className="w-12 h-12" />

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom"
 import { Calendar, ImageIcon, Users, LogOut, ArrowRight } from "lucide-react"
 
+import { useAuth } from "../../../hooks/useAuth"
 import { Button } from "../../../components/Button"
-import { useAuth } from "../../../contexts/AuthContext"
 
 export default function AdminDashboard() {
   const navigate = useNavigate()

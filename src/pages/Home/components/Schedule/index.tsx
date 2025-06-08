@@ -5,8 +5,8 @@ export default function Schedule() {
   const { t } = useTranslation()
 
   return (
-    <section id="schedule" className="py-16 bg-[#63A6DC] text-white">
-      <div className="container mx-auto px-4 text-center">
+    <section id="schedule" className="py-16 bg-[#63A6DC] text-white w-full min-h-[50vh] flex items-center">
+      <div className="container mx-auto px-4 text-center max-w-full">
         <h2 className="text-3xl font-bold mb-8">{t('schedule.title')}</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div>
