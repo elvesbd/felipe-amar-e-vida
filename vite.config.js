@@ -4,7 +4,10 @@ import path from "path";
 import tailwindcss from '@tailwindcss/vite';
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
+    plugins: [
+        react(),
+        tailwindcss(),
+    ],
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
@@ -16,6 +19,18 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
-        sourcemap: true
+        sourcemap: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Separar bibliotecas principais
+                    'react-vendor': ['react', 'react-dom'],
+                    'date-utils': ['date-fns'],
+                    'validation': ['zod'],
+                    'date-picker': ['react-datepicker'],
+                    'icons': ['lucide-react']
+                }
+            }
+        }
     }
 });
