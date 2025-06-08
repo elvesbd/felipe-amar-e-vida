@@ -1,11 +1,7 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "../../../../components/Button";
 import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export interface HeroProps {
-  readonly content: any
-  readonly language: string
-}
+import { Button } from "../../../../components/Button";
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -15,26 +11,16 @@ export default function Hero() {
       id: 1,
       image:
         "/banner_1.jpeg",
-      /* title: language === "pt" ? "Transformando Vidas Através do Surfe" : "Transforming Lives Through Surfing",
-      subtitle:
-        language === "pt"
-          ? "Aulas gratuitas de surfe adaptado na Praia do Futuro"
-          : "Free adaptive surf lessons at Praia do Futuro", */
     },
     {
       id: 2,
       image:
         "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80",
-      /* title: language === "pt" ? "Inclusão e Superação" : "Inclusion and Overcoming",
-      subtitle:
-        language === "pt" ? "Quebrando barreiras e construindo sonhos" : "Breaking barriers and building dreams", */
     },
     {
       id: 3,
       image:
         "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80",
-      /* title: language === "pt" ? "Surfe Para Todos" : "Surfing For Everyone",
-      subtitle: language === "pt" ? "Adaptando o esporte para cada necessidade" : "Adapting the sport for every need", */
     },
   ]
 
@@ -45,19 +31,6 @@ export default function Hero() {
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
   }
-
-  /* const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      const headerHeight = 72
-      const elementPosition = element.offsetTop - headerHeight
-
-      window.scrollTo({
-        top: elementPosition,
-        behavior: "smooth",
-      })
-    }
-  } */
 
   return (
     <section id="home" className="relative h-[600px] overflow-hidden">
@@ -70,19 +43,6 @@ export default function Hero() {
           >
             <img src={slide.image || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/40" />
-            {/* <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white max-w-4xl px-4">
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">{slide.title}</h1>
-                <p className="text-lg md:text-xl lg:text-2xl mb-8 leading-relaxed">{slide.subtitle}</p>
-                <Button
-                  size="lg"
-                  className="bg-[#63A6DC] hover:bg-[#4a8bc4] text-white px-8 py-3 text-lg"
-                  onClick={() => scrollToSection("about")}
-                >
-                  {content.hero.cta}
-                </Button>
-              </div>
-            </div> */}
           </div>
         ))}
       </div>
