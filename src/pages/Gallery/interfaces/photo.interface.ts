@@ -33,6 +33,10 @@ export interface RegisterPhotoResponse {
   message: string;
 }
 
+export interface DeletePhotoResponse {
+  message: string;
+}
+
 export interface UploadedPhotoFormData {
   category: string
   photos: Array<{

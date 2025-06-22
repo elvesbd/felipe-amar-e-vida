@@ -8,10 +8,9 @@ import { Label } from "../../../../../components/Label"
 import { Button } from "../../../../../components/Button"
 import { Textarea } from "../../../../../components/TextArea"
 import { uploadToS3 } from "../../../../../services/s3/upload"
-import { getPreSignedUrl } from "../../../../../services/s3/getPresignedURL"
 import type { UploadedPhotoFormData } from "../../../../Gallery/interfaces/photo.interface"
+import { getPreSignedUrl } from "../../../../../lib/api"
 
-// Interface para cada foto individual
 interface PhotoItem {
   file: File
   preview: string

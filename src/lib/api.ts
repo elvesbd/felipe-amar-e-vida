@@ -2,10 +2,16 @@ import axios, { type AxiosError, type AxiosRequestConfig } from "axios"
 
 import { getTokens, removeTokens, setTokens } from "./auth"
 import type {
+  DeletePhotoResponse,
   GalleryPhotoResponse,
   RegisterPhotoData,
   RegisterPhotoResponse
 } from "../pages/Gallery/interfaces/photo.interface"
+
+export interface PreSignedUrlResponse {
+  signedURL: string
+  publicURL: string
+}
 
 // Cria uma instância do axios com a URL base da API
 export const api = axios.create({
@@ -106,7 +112,6 @@ api.interceptors.response.use(
   },
 )
 
-// Função para fazer refresh do token
 export async function refreshAccessToken(): Promise<string> {
   const { refreshToken } = getTokens()
 
@@ -131,7 +136,6 @@ export async function refreshAccessToken(): Promise<string> {
   }
 }
 
-// Função de login
 export async function signIn({ email, password }: { email: string; password: string }) {
   try {
     const response = await api.post("/sign-in", { email, password })
@@ -142,9 +146,6 @@ export async function signIn({ email, password }: { email: string; password: str
   }
 }
 
-/**
- * Busca fotos da galeia
- */
 export async function getGalleryPhotos() {
   try {
     const { data: { photos } } = await api.get<GalleryPhotoResponse>("/galery-photos")
@@ -155,9 +156,6 @@ export async function getGalleryPhotos() {
   }
 }
 
-/**
- * Registra uma foto na base de dados
- */
 export async function registerPhoto(data: RegisterPhotoData) {
   try {
     return await api.post<RegisterPhotoResponse>("/register-photo", data)
@@ -167,28 +165,27 @@ export async function registerPhoto(data: RegisterPhotoData) {
   }
 }
 
-/**
- * Cadastra um novo cliente
- */
-export async function cadastrarCliente(cliente: Partial<any>) {
+export async function deletePhoto(photoId: string) {
   try {
-    const response = await api.post<any>("/customers", cliente)
-    return response.data
+    return await api.delete<DeletePhotoResponse>(`/photo/${photoId}`)
   } catch (error) {
-    console.error("Erro ao cadastrar cliente:", error)
+    console.error("Erro ao apagar foto:", error)
     throw error
   }
 }
 
-/**
- * Atualiza um cliente existente
- */
-export async function atualizarCliente(id: string, cliente: Partial<any>) {
+export async function getPreSignedUrl(file: File) {
   try {
-    const response = await api.put<any>(`/customers/${id}`, cliente)
-    return response.data
+    const { data } = await api.post<PreSignedUrlResponse>("/get-pre-signed-url", {
+      fileName: file.name,
+    })
+
+    return {
+      signedURL: data.signedURL,
+      publicURL: data.publicURL
+    }
   } catch (error) {
-    console.error(`Erro ao atualizar cliente ${id}:`, error)
+    console.error("Erro ao obter pre-signed URL:", error)
     throw error
   }
 }

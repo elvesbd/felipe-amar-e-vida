@@ -1,36 +1,34 @@
-"use client"
-
 import type React from "react"
+import { parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { useState, useEffect } from "react"
 import DatePicker, { registerLocale } from "react-datepicker"
-import { X, Upload, Calendar, Clock, ImageIcon } from "lucide-react"
+import { X, Upload, Calendar, Clock, ImageIcon, MapPin } from "lucide-react"
 import "react-datepicker/dist/react-datepicker.css"
-import { validateEventForm } from "./validation/event-form.validation"
-import { MapPin } from "lucide-react"
-import { getPreSignedUrl } from "../../../../../services/s3/getPresignedURL"
-import { uploadToS3 } from "../../../../../services/s3/upload"
+
 import type { Event } from "../.."
-import { parseISO } from "date-fns"
+import { getPreSignedUrl } from "../../../../../lib/api"
+import { uploadToS3 } from "../../../../../services/s3/upload"
+import { validateEventForm } from "./validation/event-form.validation"
 
 // Registrar o locale pt-BR
 registerLocale("pt-BR", ptBR)
 
 interface EventFormModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: any) => void
-  event?: Event | null
+  readonly isOpen: boolean
+  readonly onClose: () => void
+  readonly onSubmit: (data: any) => void
+  readonly event?: Event | null
 }
 
 interface EventFormData {
-  title: string
-  description: string
-  fullDescription: string
-  location: string
-  startTime: string
-  endTime: string
-  image?: File
+  readonly title: string
+  readonly description: string
+  readonly fullDescription: string
+  readonly location: string
+  readonly startTime: string
+  readonly endTime: string
+  readonly image?: File
 }
 
 export default function EventFormModal({ isOpen, onClose, onSubmit, event }: EventFormModalProps) {

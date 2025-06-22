@@ -7,7 +7,7 @@ import { Badge } from "../../../components/Badge"
 import { Button } from "../../../components/Button"
 import PhotoViewModal from "./components/PhotoViewModal"
 import PhotoUploadModal from "./components/PhotoUploadModal"
-import { getGalleryPhotos, registerPhoto } from "../../../lib/api"
+import { deletePhoto, getGalleryPhotos, registerPhoto } from "../../../lib/api"
 import type { GalleryPhoto, UploadedPhotoFormData } from "../../Gallery/interfaces/photo.interface"
 
 
@@ -53,11 +53,15 @@ export default function AdminGallery() {
     return matchesCategory
   })
 
-  const handleDelete = (photo: GalleryPhoto) => {
-    if (window.confirm(`Tem certeza que deseja excluir a foto?`)) {
-      console.log("Excluir foto:", photo.id)
-      // Aqui você faria a chamada para a API
-      // DELETE /api/photos/${photo.id}
+  const handleDelete = async (photo: GalleryPhoto) => {
+    try {
+      await deletePhoto(photo.id)
+      toast.success("Foto apagada com sucesso!")
+
+      const updatedPhotos = await getGalleryPhotos()
+      setPhotos(updatedPhotos)
+    } catch {
+      toast.error("Erro ao apagar a foto. Tente novamente.")
     }
   }
 
@@ -86,7 +90,6 @@ export default function AdminGallery() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50">
-      {/* Header */}
       <header className="bg-white shadow-sm border-0">
         <div className="container mx-auto px-4 md:px-6 py-4 md:py-6">
           {/* Layout Desktop */}
@@ -135,7 +138,6 @@ export default function AdminGallery() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
@@ -151,7 +153,6 @@ export default function AdminGallery() {
           ))}
         </div>
 
-        {/* Grid de Fotos */}
         {filteredPhotos.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 text-center border-0 mt-6">
             <ImageIcon className="h-12 md:h-16 w-12 md:w-16 text-gray-300 mx-auto mb-4" />
