@@ -1,12 +1,15 @@
 import { useEffect } from "react"
 import { X, Trash2, Download } from "lucide-react"
+
 import { Button } from "../../../../../components/Button"
-import type { Photo } from "../../../../Gallery/interfaces/photo.interface"
+import type { GalleryPhoto } from "../../../../Gallery/interfaces/photo.interface"
+import { downloadFileFromUrl } from "../../../../../lib/utils"
+
 
 interface PhotoViewModalProps {
-  readonly photo: Photo | null
+  readonly photo: GalleryPhoto | null
   readonly onClose: () => void
-  readonly onDelete: (photo: Photo) => void
+  readonly onDelete: (photo: GalleryPhoto) => void
 }
 
 export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewModalProps) {
@@ -34,15 +37,7 @@ export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewMo
   }
 
   const handleDownload = () => {
-    if (photo) {
-      // Simular download da imagem
-      const link = document.createElement("a")
-      link.href = photo.publicUrl
-      link.download = `${photo.originalName}.jpg`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
+    if (photo) downloadFileFromUrl(photo.publicUrl, `${photo.id}`)
   }
 
   if (!photo) return null
@@ -50,7 +45,6 @@ export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewMo
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
       <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
-        {/* Botão Fechar */}
         <Button
           variant="ghost"
           size="icon"
@@ -60,7 +54,6 @@ export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewMo
           <X className="h-6 w-6" />
         </Button>
 
-        {/* Ações */}
         <div className="absolute top-4 left-4 flex space-x-2 z-10">
           <Button
             variant="ghost"
@@ -82,11 +75,12 @@ export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewMo
           </Button>
         </div>
 
-        {/* Imagem */}
         <div className="relative max-w-full max-h-full">
-          <img src={photo.publicUrl || "/placeholder.svg"} alt={photo.altText} className="max-w-full max-h-full object-contain" />
-
-          {/* Informações da Foto */}
+          <img
+            src={photo.publicUrl || "/placeholder.svg"}
+            alt={photo.altTextPt}
+            className="max-w-full max-h-full object-contain"
+          />
         </div>
       </div>
     </div>

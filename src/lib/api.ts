@@ -1,6 +1,11 @@
 import axios, { type AxiosError, type AxiosRequestConfig } from "axios"
 
 import { getTokens, removeTokens, setTokens } from "./auth"
+import type {
+  GalleryPhotoResponse,
+  RegisterPhotoData,
+  RegisterPhotoResponse
+} from "../pages/Gallery/interfaces/photo.interface"
 
 // Cria uma instância do axios com a URL base da API
 export const api = axios.create({
@@ -116,7 +121,7 @@ export async function refreshAccessToken(): Promise<string> {
 
     setTokens({
       accessToken: newAccessToken,
-      refreshToken: newRefreshToken || refreshToken,
+      refreshToken: newRefreshToken ?? refreshToken,
     })
 
     return newAccessToken
@@ -137,30 +142,27 @@ export async function signIn({ email, password }: { email: string; password: str
   }
 }
 
-// API de Clientes
-
 /**
- * Busca todos os clientes
+ * Busca fotos da galeia
  */
-export async function getClientes() {
+export async function getGalleryPhotos() {
   try {
-    const response = await api.get<any[]>("/customers")
-    return response.data;
+    const { data: { photos } } = await api.get<GalleryPhotoResponse>("/galery-photos")
+    return photos;
   } catch (error) {
-    console.error("Erro ao buscar clientes:", error)
+    console.error("Erro ao buscar fotos da galeria:", error)
     throw error
   }
 }
 
 /**
- * Busca um cliente específico pelo ID
+ * Registra uma foto na base de dados
  */
-export async function getCliente(id: string) {
+export async function registerPhoto(data: RegisterPhotoData) {
   try {
-    const response = await api.get<any>(`/customers/${id}`)
-    return response.data;
+    return await api.post<RegisterPhotoResponse>("/register-photo", data)
   } catch (error) {
-    console.error(`Erro ao buscar cliente ${id}:`, error)
+    console.error("Erro ao registrar foto:", error)
     throw error
   }
 }

@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { toast } from "react-toastify"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Upload, Trash2, ImageIcon, Eye } from "lucide-react"
 
@@ -6,89 +7,39 @@ import { Badge } from "../../../components/Badge"
 import { Button } from "../../../components/Button"
 import PhotoViewModal from "./components/PhotoViewModal"
 import PhotoUploadModal from "./components/PhotoUploadModal"
-import type { Photo } from "../../Gallery/interfaces/photo.interface"
+import { getGalleryPhotos, registerPhoto } from "../../../lib/api"
+import type { GalleryPhoto, UploadedPhotoFormData } from "../../Gallery/interfaces/photo.interface"
+
 
 export default function AdminGallery() {
   const navigate = useNavigate()
 
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
-  const [viewingPhoto, setViewingPhoto] = useState<Photo | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [viewingPhoto, setViewingPhoto] = useState<GalleryPhoto | null>(null)
 
-  const [photos] = useState<Photo[]>([
-    {
-      id: "1",
-      publicUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Aula de surfe adaptado na Praia do Futuro",
-      category: "Aulas",
-      uploadDate: "2024-01-15",
-      size: "2.3 MB",
-      originalName: "foto"
-    },
-    {
-      id: "2",
-      publicUrl: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Aluno praticando surfe com instrutor",
-      category: "Aulas",
-      uploadDate: "2024-01-14",
-      size: "1.8 MB",
-      originalName: "foto"
-    },
-    {
-      id: "3",
-      publicUrl: "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Evento de confraternização do projeto",
-      category: "Eventos",
-      uploadDate: "2024-01-13",
-      size: "3.1 MB",
-      originalName: "foto"
-    },
-    {
-      id: "4",
-      publicUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Equipamentos de surfe adaptado",
-      category: "Equipamentos",
-      uploadDate: "2024-01-12",
-      size: "1.5 MB",
-      originalName: "foto"
-    },
-    {
-      id: "5",
-      publicUrl: "https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Grupo de alunos na praia",
-      category: "Aulas",
-      uploadDate: "2024-01-11",
-      size: "2.7 MB",
-      originalName: "foto"
-    },
-    {
-      id: "6",
-      publicUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Competição de surfe adaptado",
-      category: "Eventos",
-      uploadDate: "2024-01-10",
-      size: "2.9 MB",
-      originalName: "foto"
-    },
-    {
-      id: "7",
-      publicUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Pranchas adaptadas para deficientes visuais",
-      category: "Equipamentos",
-      uploadDate: "2024-01-09",
-      size: "1.9 MB",
-      originalName: "foto"
-    },
-    {
-      id: "8",
-      publicUrl: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Workshop de conscientização ambiental",
-      category: "Eventos",
-      uploadDate: "2024-01-08",
-      size: "2.1 MB",
-      originalName: "foto"
-    },
-  ])
+  useEffect(() => {
+    async function fetchPhotos() {
+      try {
+        const response = await getGalleryPhotos()
+        setPhotos(response)
+
+        response.forEach((photo) => {
+          if (photo.publicUrl) {
+            const img = new Image()
+            img.src = photo.publicUrl
+          }
+        })
+      } catch (error) {
+        console.error("Erro ao carregar fotos:", error)
+        toast.error("Erro ao carregar fotos da galeria. Tente novamente mais tarde.")
+
+      }
+    }
+
+    fetchPhotos()
+  }, [])
 
   const categories = [
     { key: "all", label: "Todas", color: "bg-gray-100 text-gray-700" },
@@ -102,7 +53,7 @@ export default function AdminGallery() {
     return matchesCategory
   })
 
-  const handleDelete = (photo: Photo) => {
+  const handleDelete = (photo: GalleryPhoto) => {
     if (window.confirm(`Tem certeza que deseja excluir a foto?`)) {
       console.log("Excluir foto:", photo.id)
       // Aqui você faria a chamada para a API
@@ -110,13 +61,26 @@ export default function AdminGallery() {
     }
   }
 
-  const handleUploadPhoto = (photoData: any) => {
-    console.log("Upload de nova foto:", photoData)
-    // Aqui você faria a chamada para a API
-    // POST /api/photos
+  const handleUploadPhoto = async (data: UploadedPhotoFormData) => {
+    try {
+      const payload = {
+        category: data.category,
+        photos: data.photos.map(({ altText, publicUrl }) => ({
+          altText,
+          publicUrl,
+        })),
+      }
+      await registerPhoto(payload)
+      toast.success("Foto registrada com sucesso!")
+
+      const updatedPhotos = await getGalleryPhotos()
+      setPhotos(updatedPhotos)
+    } catch {
+      toast.error("Erro ao registrar a foto. Tente novamente.")
+    }
   }
 
-  const handleViewPhoto = (photo: Photo) => {
+  const handleViewPhoto = (photo: GalleryPhoto) => {
     setViewingPhoto(photo)
   }
 
@@ -214,8 +178,9 @@ export default function AdminGallery() {
                   {/* Imagem */}
                   <div className="relative aspect-square overflow-hidden">
                     <img
+                      loading="lazy"
                       src={photo.publicUrl || "/placeholder.svg"}
-                      alt={photo.altText}
+                      alt={photo.altTextPt}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
 
@@ -244,7 +209,7 @@ export default function AdminGallery() {
                     {/* Badge da Categoria */}
                     <div className="absolute top-2 left-2">
                       <Badge
-                        className={`text-xs font-medium ${categories.find((c) => c.key === photo.category)?.color || "bg-gray-100 text-gray-700"
+                        className={`text-xs font-medium ${categories.find((c) => c.key === photo.category)?.color ?? "bg-gray-100 text-gray-700"
                           }`}
                       >
                         {photo.category}

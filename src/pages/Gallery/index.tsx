@@ -1,37 +1,53 @@
-"use client"
-
+import { toast } from "react-toastify"
 import { ArrowLeft } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { useEffect, useState, useMemo } from "react"
 
 import Header from "../../components/Header"
+import { getAltText } from "../../lib/utils"
 import { Badge } from "../../components/Badge"
 import Footer from "../Home/components/Footer"
 import { Button } from "../../components/Button"
+import { getGalleryPhotos } from "../../lib/api"
 import PhotoModal from "../../components/PhotoModal"
-import type { Photo } from "./interfaces/photo.interface"
+import type { GalleryPhoto } from "./interfaces/photo.interface"
+import Pagination from "./components/Pagination"
+
 
 export default function GalleryPage() {
   const photosPerPage = 12
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedPhoto, setSelectedPhoto] = useState<GalleryPhoto | null>(null)
 
-  const [photos] = useState<Photo[]>([
-    {
-      id: "1",
-      publicUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      altText: "Aula de surfe adaptado na Praia do Futuro",
-      category: "Aulas",
-      uploadDate: "2024-01-15",
-      size: "2.3 MB",
-      originalName: "foto"
-    },
-  ])
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
+    async function fetchPhotos() {
+      try {
+        const response = await getGalleryPhotos()
+        setPhotos(response)
+
+        response.forEach((photo) => {
+          if (photo.publicUrl) {
+            const img = new Image()
+            img.src = photo.publicUrl
+          }
+        })
+      } catch (error) {
+        console.error("Erro ao carregar fotos:", error)
+        toast.error("Erro ao carregar fotos da galeria. Tente novamente mais tarde.")
+      }
+    }
+    fetchPhotos()
+  }, [])
 
   const categories = [
     { key: "all", label: t("gallery.categories.all") },
@@ -40,14 +56,22 @@ export default function GalleryPage() {
     { key: "Equipamentos", label: t("gallery.categories.equipamentos") },
   ]
 
-  const filteredPhotos =
-    selectedCategory === "all" ? photos : photos.filter((photo) => photo.category === selectedCategory)
+
+  const filteredPhotos = useMemo(() => {
+    return selectedCategory === "all"
+      ? photos
+      : photos.filter((photo) => photo.category === selectedCategory)
+  }, [photos, selectedCategory])
+
   const totalPages = Math.ceil(filteredPhotos.length / photosPerPage)
 
-  const startIndex = (currentPage - 1) * photosPerPage
-  const currentPhotos = filteredPhotos.slice(startIndex, startIndex + photosPerPage)
+  const currentPhotos = useMemo(() => {
+    const startIndex = (currentPage - 1) * photosPerPage
+    return filteredPhotos.slice(startIndex, startIndex + photosPerPage)
+  }, [filteredPhotos, currentPage])
 
-  const openModal = (photo: Photo) => {
+
+  const openModal = (photo: GalleryPhoto) => {
     setSelectedPhoto(photo)
   }
 
@@ -71,17 +95,12 @@ export default function GalleryPage() {
     }
   }
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
 
       <div className="flex-grow">
         <div className="container mx-auto px-4 py-8">
-          {/* Header da Galeria */}
           <div className="mb-8">
             <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 text-[#63A6DC] hover:text-[#4a8bc4]">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -89,7 +108,6 @@ export default function GalleryPage() {
             </Button>
           </div>
 
-          {/* Filtros de Categoria */}
           <div className="mb-8">
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
@@ -109,7 +127,6 @@ export default function GalleryPage() {
             </div>
           </div>
 
-          {/* Grid de Fotos */}
           {currentPhotos.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
@@ -121,8 +138,9 @@ export default function GalleryPage() {
                   >
                     <div className="aspect-square">
                       <img
+                        loading="lazy"
                         src={photo.publicUrl || "/placeholder.svg"}
-                        alt={photo.altText}
+                        alt={getAltText(photo, i18n.language)}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
@@ -136,37 +154,11 @@ export default function GalleryPage() {
               </div>
 
               {totalPages > 1 && (
-                <div className="flex justify-center items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    Anterior
-                  </Button>
-
-                  <div className="flex space-x-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCurrentPage(page)}
-                        className={currentPage === page ? "bg-[#63A6DC] hover:bg-[#4a8bc4]" : ""}
-                      >
-                        {page}
-                      </Button>
-                    ))}
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    Próxima
-                  </Button>
-                </div>
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                />
               )}
             </>
           ) : (
