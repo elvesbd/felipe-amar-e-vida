@@ -5,13 +5,12 @@ import { useAuth } from "../../../hooks/useAuth"
 
 interface ProtectedRouteProps {
   readonly children: ReactNode
-  readonly adminOnly?: boolean
 }
 
-export default function ProtectedRoute({ children, adminOnly = false }: ProtectedRouteProps) {
-  const { isAuthenticated, isAdmin, loading } = useAuth()
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading } = useAuth()
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#63A6DC]"></div>
@@ -21,10 +20,6 @@ export default function ProtectedRoute({ children, adminOnly = false }: Protecte
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
-  }
-
-  if (adminOnly && !isAdmin) {
-    return <Navigate to="/" replace />
   }
 
   return <>{children}</>

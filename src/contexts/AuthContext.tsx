@@ -1,79 +1,78 @@
-import { createContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useState, useEffect, useCallback, useMemo } from "react"
 
-interface User {
-  id: string
-  email: string
-  name: string
-  role: "admin" | "user"
-}
+import { api, refreshAccessToken } from "../lib/api"
+import type { User } from "./interfaces/user.interface"
+import { getTokens, removeTokens, setTokens } from "../lib/auth"
+import type { AuthContextProps } from "./interfaces/auth-context.interface"
+import type { AuthProviderProps } from "./interfaces/auth-provider.interface"
 
-interface AuthContextType {
-  user: User | null
-  login: (email: string, password: string) => Promise<boolean>
-  logout: () => void
-  isAuthenticated: boolean
-  isAdmin: boolean
-  loading: boolean
-}
 
-interface AuthProviderProps {
-  readonly children: ReactNode
-}
+export const AuthContext = createContext<AuthContextProps>({
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  signIn: async () => { },
+  signOut: () => { },
+})
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: Readonly<AuthProviderProps>) {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+
 
   useEffect(() => {
-    // Verificar se há um usuário logado no localStorage
-    try {
-      const savedUser = localStorage.getItem("user")
-      if (savedUser) {
-        setUser(JSON.parse(savedUser))
+    const loadUserFromTokens = async () => {
+      try {
+        const tokens = getTokens()
+
+        if (!tokens.accessToken) {
+          setIsLoading(false)
+          return
+        }
+
+        // Verificar se o token está válido fazendo uma requisição para obter dados do usuário
+        const response = await api.get("/profile")
+        setUser(response.data)
+      } catch {
+        // Se o token estiver expirado, tenta fazer refresh
+        try {
+          await refreshAccessToken()
+          const response = await api.get("/profile")
+          setUser(response.data)
+        } catch {
+          removeTokens()
+        }
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error("Erro ao recuperar usuário:", error)
-      localStorage.removeItem("user") // Remove o item inválido
     }
-    setLoading(false)
+
+    loadUserFromTokens()
   }, [])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      // Simulação de login - substituir por API real
-      if (email === "admin@felipeamarevida.com.br" && password === "admin123") {
-        const userData: User = {
-          id: "1",
-          email: email,
-          name: "Administrador",
-          role: "admin",
-        }
-        setUser(userData)
-        localStorage.setItem("user", JSON.stringify(userData))
-        return true
-      }
-      return false
-    } catch (error) {
-      console.error("Erro no login:", error)
-      return false
-    }
-  }
+  const signIn = useCallback(async (credentials: { email: string; password: string }) => {
+    const response = await api.post("/sign-in", credentials)
+    const { accessToken, refreshToken, user: userData } = response.data
 
-  const logout = () => {
+    setTokens({ accessToken, refreshToken })
+    setUser(userData)
+  }, [])
+
+  const signOut = useCallback(() => {
+    removeTokens()
     setUser(null)
-    localStorage.removeItem("user")
-  }
+  }, [])
 
-  const value = {
-    user,
-    login,
-    logout,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === "admin",
-    loading,
-  }
+  const authContextValue = useMemo(
+    () => ({
+      user,
+      isAuthenticated: !!user,
+      isLoading,
+      signIn,
+      signOut,
+    }),
+    [user, isLoading, signIn, signOut]
+  )
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>
 }

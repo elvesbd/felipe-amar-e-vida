@@ -6,10 +6,10 @@ import { Button } from "../../../components/Button"
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user, signOut } = useAuth()
 
   const handleLogout = () => {
-    logout()
+    signOut()
     navigate("/")
   }
 
@@ -24,7 +24,7 @@ export default function AdminDashboard() {
 
               <div className="flex flex-col items-start">
                 <span className="text-lg md:text-xl font-bold text-gray-900 leading-tight">Painel Administrativo</span>
-                <span className="text-xs text-gray-600">Bem-vindo, {user?.name}!</span>
+                <span className="text-xs text-gray-600">Bem-vindo, {user?.username}!</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -54,7 +54,7 @@ export default function AdminDashboard() {
             {/* Textos alinhados com a logo */}
             <div className="flex flex-col items-start ml-4 flex-1">
               <span className="text-lg font-bold text-gray-900 leading-tight">Painel Administrativo</span>
-              <span className="text-xs text-gray-600">Bem-vindo, {user?.name}!</span>
+              <span className="text-xs text-gray-600">Bem-vindo, {user?.username}!</span>
             </div>
 
             {/* Botões de ação */}
