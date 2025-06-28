@@ -1,40 +1,16 @@
+import { toast } from "react-toastify"
 import { ArrowLeft } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 import EventCard from "./components/Card"
+import { getEvents } from "../../lib/api"
 import EventModal from "./components/Modal"
 import Header from "../../components/Header"
 import Footer from "../Home/components/Footer"
 import { Button } from "../../components/Button"
-import { useTranslation } from "react-i18next"
-
-interface Event {
-  id: number
-  title: {
-    pt: string
-    en: string
-  }
-  description: {
-    pt: string
-    en: string
-  }
-  date: {
-    pt: string
-    en: string
-  }
-  time: string
-  location: string
-  category: {
-    pt: string
-    en: string
-  }
-  image: string
-  fullDescription?: {
-    pt: string
-    en: string
-  }
-}
+import type { Event } from "../../lib/interfaces/events.interfaces"
 
 export default function EventsPage() {
   const eventsPerPage = 6
@@ -42,6 +18,7 @@ export default function EventsPage() {
   const navigate = useNavigate()
 
   const [currentPage, setCurrentPage] = useState(1)
+  const [events, setEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 
   // Scroll para o topo quando a página carregar
@@ -49,35 +26,29 @@ export default function EventsPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  const allEvents: Event[] = [
-    {
-      id: 1,
-      title: {
-        pt: "Aula Especial de Surfe Adaptado",
-        en: "Special Adaptive Surf Class",
-      },
-      description: {
-        pt: "Esta aula especial será dedicada ao desenvolvimento de técnicas avançadas de surfe adaptado, com foco especial em pessoas com deficiência visual. Contaremos com instrutores especializados e equipamentos adaptados para garantir uma experiência segura e enriquecedora para todos os participantes.",
-        en: "This special class will be dedicated to developing advanced adaptive surfing techniques, with a special focus on people with visual impairments. We will have specialized instructors and adapted equipment to ensure a safe and enriching experience for all participants.",
-      },
-      date: {
-        pt: "15 de Janeiro, 2024",
-        en: "January 15, 2024",
-      },
-      time: "14h45 - 17h00",
-      location: "PF Surf School - Praia do Futuro",
-      category: {
-        pt: "Aulas Especiais",
-        en: "Special Classes",
-      },
-      image:
-        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-    }
-  ]
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await getEvents()
+        setEvents(response)
 
-  const totalPages = Math.ceil(allEvents.length / eventsPerPage)
+        response.forEach((photo) => {
+          if (photo.publicUrl) {
+            const img = new Image()
+            img.src = photo.publicUrl
+          }
+        })
+      } catch (error) {
+        console.error("Erro ao carregar eventos:", error)
+        toast.error("Erro ao carregar eventos. Tente novamente mais tarde.")
+      }
+    }
+    fetchEvents()
+  }, [])
+
+  const totalPages = Math.ceil(events.length / eventsPerPage)
   const startIndex = (currentPage - 1) * eventsPerPage
-  const currentEvents = allEvents.slice(startIndex, startIndex + eventsPerPage)
+  const currentEvents = events.slice(startIndex, startIndex + eventsPerPage)
 
   const openModal = (event: Event) => {
     setSelectedEvent(event)

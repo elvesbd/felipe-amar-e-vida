@@ -1,20 +1,21 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { Button } from "../Button"
-import type { Photo } from "../../pages/Gallery/interfaces/photo.interface"
-import { useTranslation } from "react-i18next"
+import { getAltText } from "../../lib/utils"
+import type { GalleryPhoto } from "../../pages/Gallery/interfaces/photo.interface"
 
 interface PhotoModalProps {
-  readonly photo: Photo | null
-  readonly photos: Photo[]
+  readonly photo: GalleryPhoto | null
+  readonly photos: GalleryPhoto[]
   readonly onClose: () => void
   readonly onNext: () => void
   readonly onPrev: () => void
 }
 
 export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: PhotoModalProps) {
-  const { t } = useTranslation()
+  const { i18n } = useTranslation()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -42,8 +43,8 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
       <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
         <Button
-          variant="ghost"
           size="icon"
+          variant="ghost"
           className="absolute top-4 right-4 text-white hover:bg-white/20 z-10"
           onClick={onClose}
         >
@@ -70,16 +71,13 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
           <ChevronRight className="h-8 w-8" />
         </Button>
 
-        <div className="relative max-w-full max-h-full">
-          <img src={photo.publicUrl || "/placeholder.svg"} alt={photo.altText} className="max-w-full max-h-full object-contain" />
-
-          {/* Image Info */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-            <p className="text-white/80 text-sm">
-              {currentIndex + 1} de {photos.length} • {t(`gallery.categories.${photo.category.toLowerCase()}`)}
-
-            </p>
-          </div>
+        <div className="relative max-w-full max-h-screen">
+          <img
+            loading="lazy"
+            src={photo.publicUrl || "/placeholder.svg"}
+            alt={getAltText(photo, i18n.language)}
+            className="w-full max-h-screen object-contain"
+          />
         </div>
       </div>
     </div>

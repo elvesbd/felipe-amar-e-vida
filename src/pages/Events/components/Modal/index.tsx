@@ -3,29 +3,14 @@ import { useTranslation } from "react-i18next"
 import { X, Calendar, Clock, MapPin } from "lucide-react"
 
 import { Button } from "../../../../components/Button"
-
-interface Event {
-  id: number
-  title: {
-    pt: string
-    en: string
-  }
-  description: {
-    pt: string
-    en: string
-  }
-  date: {
-    pt: string
-    en: string
-  }
-  category: {
-    pt: string
-    en: string
-  }
-  time: string
-  location: string
-  image: string
-}
+import type { Event } from "../../../../lib/interfaces/events.interfaces"
+import {
+  getEventDate,
+  getEventTitle,
+  getEventTimeRange,
+  getEventDescription,
+  getEventFullDescription,
+} from "../../../../lib/utils"
 
 interface EventModalProps {
   readonly event: Event | null
@@ -60,8 +45,8 @@ export default function EventModal({ event, onClose }: EventModalProps) {
         {/* Header */}
         <div className="relative">
           <img
-            src={event.image || "/placeholder.svg"}
-            alt={event.title[language]}
+            src={event.publicUrl || "/placeholder.svg"}
+            alt={getEventTitle(event, language)}
             className="w-full h-64 object-cover"
           />
           <Button
@@ -76,17 +61,21 @@ export default function EventModal({ event, onClose }: EventModalProps) {
 
         {/* Content */}
         <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">{event.title[language]}</h2>
+          <h2 className="text-2xl font-bold mb-4">{getEventTitle(event, language)}</h2>
+
+          {getEventDescription(event, language) && (
+            <p className="text-gray-500 mb-4">{getEventDescription(event, language)}</p>
+          )}
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div className="flex items-center text-gray-600">
               <Calendar className="h-5 w-5 mr-3 text-[#63A6DC]" />
-              <span>{event.date[language]}</span>
+              <span>{getEventDate(event, language)}</span>
             </div>
 
             <div className="flex items-center text-gray-600">
               <Clock className="h-5 w-5 mr-3 text-[#63A6DC]" />
-              <span>{event.time}</span>
+              <span>{getEventTimeRange(event)}</span>
             </div>
 
             <div className="flex items-center text-gray-600 md:col-span-2">
@@ -97,7 +86,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
 
           <div className="prose max-w-none">
             <p className="text-gray-700 leading-relaxed text-justify">
-              {event.description[language]}
+              {getEventFullDescription(event, language)}
             </p>
           </div>
         </div>

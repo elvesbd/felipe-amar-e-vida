@@ -1,68 +1,56 @@
-import { useState } from "react"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import { toast } from "react-toastify"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Plus, Edit, Trash2, Calendar, Clock, MapPin, Search } from "lucide-react"
 
 import { Input } from "../../../components/Input"
 import { Button } from "../../../components/Button"
+import { getEventTimeRange } from "../../../lib/utils"
 import EventFormModal from "./components/EventsFormModal"
+import type { Event, IEvent } from "../../../lib/interfaces/events.interfaces"
+import { deleteEvent, getEvents, registerEvent, updateEvent } from "../../../lib/api"
 
-interface TranslatedFields {
-  title: string
-  description: string
-  fullDescription?: string
-  location: string
-}
-
-export interface Event {
-  id: number | string
-  image: string
-  isoDate: string
-  startTime: string
-  endTime: string
-  timezone: string
-  pt: TranslatedFields
-  en: TranslatedFields
-}
 
 export default function AdminEvents() {
-  const currentLang = 'pt'
   const navigate = useNavigate()
+
   const [searchTerm, setSearchTerm] = useState("")
+  const [events, setEvents] = useState<Event[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
 
-  // Dados de exemplo - substituir pela API real
-  const [events] = useState<Event[]>([
-    {
-      id: "1",
-      isoDate: "2025-06-23T03:00:00.000Z", // formato ISO sugerido, você pode adaptar
-      startTime: "14:45",
-      endTime: "17:00",
-      timezone: "America/Fortaleza", // ou outro fuso horário aplicável
-      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
-      pt: {
-        title: "Aula Especial de Surfe Adaptado",
-        description: "Aula especial com foco em técnicas avançadas de surfe adaptado para pessoas com deficiência visual.",
-        fullDescription: "Esta aula especial será dedicada ao desenvolvimento de técnicas avançadas de surfe adaptado, com foco especial em pessoas com deficiência visual.",
-        location: "PF Surf School - Praia do Futuro"
-      },
-      en: {
-        title: "Special Adaptive Surfing Class",
-        description: "Special class focusing on advanced adaptive surfing techniques for people with visual impairments.",
-        fullDescription: "This special class will be dedicated to the development of advanced adaptive surfing techniques, with a special focus on people with visual impairments.",
-        location: "PF Surf School - Praia do Futuro"
-      }
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  const fetchEvents = async () => {
+    try {
+      const response = await getEvents()
+      setEvents(response)
+
+      response.forEach((photo) => {
+        if (photo.publicUrl) {
+          const img = new Image()
+          img.src = photo.publicUrl
+        }
+      })
+    } catch (error) {
+      console.error("Erro ao carregar eventos:", error)
+      toast.error("Erro ao carregar eventos. Tente novamente mais tarde.")
     }
-  ])
+  }
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
 
   const filteredEvents = events.filter((event) => {
-    const content = event[currentLang]
     const matchesSearch =
-      content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      content.description.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
+      event.titlePt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.descriptionPt.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return matchesSearch;
   })
 
 
@@ -71,22 +59,41 @@ export default function AdminEvents() {
     setIsModalOpen(true)
   }
 
-  const handleDelete = (event: Event) => {
-    // Implementar exclusão com confirmação
-    if (window.confirm(`Tem certeza que deseja excluir o evento "${event[currentLang].title}"?`)) {
-      console.log("Excluir evento:", event.id)
+  const handleDelete = async (event: Event) => {
+    try {
+      const response = await deleteEvent(event.id)
+      toast.success(response)
+
+      fetchEvents()
+    } catch (error) {
+      toast.error("Erro ao deletar evento.")
+      console.error("Erro ao deletar evento:", error)
     }
   }
 
-  const handleCreateEvent = (eventData: any) => {
+  const handleCreateEvent = async (eventData: IEvent) => {
     if (editingEvent) {
-      console.log("Atualizar evento:", editingEvent.id, eventData)
-      // Aqui você faria a chamada para a API de atualização
-      // PUT /api/events/${editingEvent.id}
+      try {
+        const response = await updateEvent(eventData)
+        toast.success(response)
+        handleCloseModal()
+
+        fetchEvents()
+      } catch (error) {
+        toast.error("Erro ao atualizar evento.")
+        console.error("Erro ao atualizar evento:", error)
+      }
     } else {
-      console.log("Criar novo evento:", eventData)
-      // Aqui você faria a chamada para a API de criação
-      // POST /api/events
+      try {
+        const response = await registerEvent(eventData)
+        toast.success(response)
+        handleCloseModal()
+
+        fetchEvents()
+      } catch (error) {
+        toast.error("Erro ao cadastrar evento.")
+        console.error("Erro ao criar evento:", error)
+      }
     }
   }
 
@@ -193,8 +200,8 @@ export default function AdminEvents() {
                 <div className="md:flex">
                   <div className="md:w-64 h-48 md:h-auto">
                     <img
-                      src={event.image || "/placeholder.svg"}
-                      alt={event[currentLang].title}
+                      src={event.publicUrl || "/placeholder.svg"}
+                      alt={event.titlePt}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -202,23 +209,21 @@ export default function AdminEvents() {
                   <div className="flex-1 p-4 md:p-6">
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                       <div className="flex-1 mb-4 md:mb-0">
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{event[currentLang].title}</h3>
-                        <p className="text-gray-600 mb-4 text-sm md:text-base line-clamp-2">{event[currentLang].description}</p>
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{event.titlePt}</h3>
+                        <p className="text-gray-600 mb-4 text-sm md:text-base line-clamp-2">{event.descriptionPt}</p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 mb-4">
                           <div className="flex items-center text-xs md:text-sm text-gray-600">
                             <Calendar className="h-3 md:h-4 w-3 md:w-4 mr-2 text-[#63A6DC] flex-shrink-0" />
-                            {format(new Date(event.isoDate), "dd 'de' MMMM',' yyyy", { locale: ptBR })}
+                            {event.isoDateBR}
                           </div>
                           <div className="flex items-center text-xs md:text-sm text-gray-600">
                             <Clock className="h-3 md:h-4 w-3 md:w-4 mr-2 text-[#63A6DC] flex-shrink-0" />
-                            <span>
-                              {event.startTime.replace(':', 'h')} - {event.endTime.replace(':', 'h')}
-                            </span>
+                            <span>{getEventTimeRange(event)}</span>
                           </div>
                           <div className="flex items-center text-xs md:text-sm text-gray-600">
                             <MapPin className="h-3 md:h-4 w-3 md:w-4 mr-2 text-[#63A6DC] flex-shrink-0" />
-                            <span className="truncate">{event[currentLang].location}</span>
+                            <span className="truncate">{event.location}</span>
                           </div>
                         </div>
                       </div>

@@ -3,25 +3,19 @@ import { useState } from "react"
 import { X, Upload, ImageIcon, Tag, FileText, Trash2 } from "lucide-react"
 
 import { categories } from "./constants/categories"
+import { photoSchema } from "./validation/photo.schema"
 import { Label } from "../../../../../components/Label"
+import { getPreSignedUrl } from "../../../../../lib/api"
 import { Button } from "../../../../../components/Button"
 import { Textarea } from "../../../../../components/TextArea"
 import { uploadToS3 } from "../../../../../services/s3/upload"
-import { photoSchema, type PhotoFormData } from "./validation/photo.schema"
-import { getPreSignedUrl } from "../../../../../services/s3/getPresignedURL"
+import type { PhotoItem, UploadedPhotoFormData } from "../../../../../lib/interfaces/photos.interfaces"
 
-// Interface para cada foto individual
-interface PhotoItem {
-  file: File
-  preview: string
-  altText: string
-  id: string
-}
 
 interface PhotoUploadModalProps {
   readonly isOpen: boolean
   readonly onClose: () => void
-  readonly onSubmit: (data: PhotoFormData) => void
+  readonly onSubmit: (data: UploadedPhotoFormData) => void
 }
 
 export default function PhotoUploadModal({ isOpen, onClose, onSubmit }: PhotoUploadModalProps) {
@@ -128,7 +122,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSubmit }: PhotoUpl
         uploadToS3(signedURL, photo.file)
       )))
 
-      const formData: PhotoFormData = {
+      const formData: UploadedPhotoFormData = {
         photos: urlsData.map(({ photo, publicURL }) => ({
           file: photo.file,
           altText: photo.altText,
@@ -243,6 +237,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSubmit }: PhotoUpl
                       {/* Preview da Imagem */}
                       <div className="relative flex-shrink-0">
                         <img
+                          loading="lazy"
                           src={photo.preview || "/placeholder.svg"}
                           alt={`Preview ${index + 1}`}
                           className="w-24 h-24 object-cover rounded-lg"
