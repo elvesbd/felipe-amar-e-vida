@@ -2,8 +2,8 @@ import { useEffect } from "react"
 import { X, Trash2, Download } from "lucide-react"
 
 import { Button } from "../../../../../components/Button"
-import type { GalleryPhoto } from "../../../../Gallery/interfaces/photo.interface"
 import { downloadFileFromUrl } from "../../../../../lib/utils"
+import type { GalleryPhoto } from "../../../../../lib/interfaces/photos.interfaces"
 
 
 interface PhotoViewModalProps {

@@ -5,18 +5,12 @@ import { X, Upload, ImageIcon, Tag, FileText, Trash2 } from "lucide-react"
 import { categories } from "./constants/categories"
 import { photoSchema } from "./validation/photo.schema"
 import { Label } from "../../../../../components/Label"
+import { getPreSignedUrl } from "../../../../../lib/api"
 import { Button } from "../../../../../components/Button"
 import { Textarea } from "../../../../../components/TextArea"
 import { uploadToS3 } from "../../../../../services/s3/upload"
-import type { UploadedPhotoFormData } from "../../../../Gallery/interfaces/photo.interface"
-import { getPreSignedUrl } from "../../../../../lib/api"
+import type { PhotoItem, UploadedPhotoFormData } from "../../../../../lib/interfaces/photos.interfaces"
 
-interface PhotoItem {
-  file: File
-  preview: string
-  altText: string
-  id: string
-}
 
 interface PhotoUploadModalProps {
   readonly isOpen: boolean

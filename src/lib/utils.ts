@@ -1,15 +1,37 @@
-import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx"
+import type { Event } from "../pages/Events/interfaces/event.interface"
 import type { GalleryPhoto } from "../pages/Gallery/interfaces/photo.interface"
+
+type Lang = "pt" | "en"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function getAltText(photo: GalleryPhoto, language: string) {
+export function getAltText(photo: GalleryPhoto, language: Lang | string) {
   return language === "pt" ? photo.altTextPt : photo.altTextEn
 }
 
+export function getEventTitle(event: Event, language: Lang): string {
+  return language === "pt" ? event.titlePt : event.titleEn
+}
+
+export function getEventDescription(event: Event, language: Lang): string {
+  return language === "pt" ? event.descriptionPt : event.descriptionEn
+}
+
+export function getEventFullDescription(event: Event, language: Lang): string {
+  return language === "pt" ? event.fullDescriptionPt : event.fullDescriptionEn
+}
+
+export function getEventDate(event: Event, language: Lang): string {
+  return language === "pt" ? event.isoDateBR : event.isoDateUS
+}
+
+export function getEventTimeRange(event: Event): string {
+  return `${event.startTime} - ${event.endTime}`
+}
 
 export async function downloadFileFromUrl(
   url: string,

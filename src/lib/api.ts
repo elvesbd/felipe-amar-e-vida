@@ -2,11 +2,17 @@ import axios, { type AxiosError, type AxiosRequestConfig } from "axios"
 
 import { getTokens, removeTokens, setTokens } from "./auth"
 import type {
+  RegisterPhotoData,
   DeletePhotoResponse,
   GalleryPhotoResponse,
-  RegisterPhotoData,
   RegisterPhotoResponse
-} from "../pages/Gallery/interfaces/photo.interface"
+} from "./interfaces/photos.interfaces"
+import type {
+  IEvent,
+  EventResponse,
+  DeleteEventResponse,
+  RegisterEventResponse
+} from "./interfaces/events.interfaces"
 
 export interface PreSignedUrlResponse {
   signedURL: string
@@ -146,6 +152,56 @@ export async function signIn({ email, password }: { email: string; password: str
   }
 }
 
+export async function getEvents() {
+  try {
+    const { data: { events } } = await api.get<EventResponse>("/events")
+    return events;
+  } catch (error) {
+    console.error("Erro ao buscar eventos da galeria:", error)
+    throw error
+  }
+}
+
+export async function registerEvent(data: IEvent) {
+  try {
+    const { data: { message } } = await api.post<RegisterEventResponse>("/register-event", data)
+    return message;
+  } catch (error) {
+    console.error("Erro ao registrar evento:", error)
+    throw error
+  }
+}
+
+export async function updateEvent(data: IEvent) {
+  try {
+    const { data: { message } } = await api.put<RegisterEventResponse>("/event", data)
+    return message;
+  } catch (error) {
+    console.error("Erro ao atualizar evento:", error)
+    throw error
+  }
+}
+
+export async function deleteEvent(eventId: string) {
+  try {
+    const { data: { message } } = await api.delete<DeleteEventResponse>(`/event/${eventId}`)
+    return message;
+  } catch (error) {
+    console.error("Erro ao apagar evento:", error)
+    throw error
+  }
+}
+
+export async function removeOldEventImage(publicUrl: string) {
+  try {
+    await api.delete(`/event/image?publicUrl=${encodeURIComponent(publicUrl)}`);
+  } catch (error) {
+    console.error("Erro ao apagar imagem antiga do evento:", error);
+    throw error;
+  }
+}
+
+
 export async function getGalleryPhotos() {
   try {
     const { data: { photos } } = await api.get<GalleryPhotoResponse>("/galery-photos")
@@ -196,7 +252,6 @@ export function formatarDinheiro(valor: number): string {
     currency: "BRL",
   }).format(valor)
 }
-
 
 export function formatarData(dataString: string): string {
   const data = new Date(dataString)

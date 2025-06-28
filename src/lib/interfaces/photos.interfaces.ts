@@ -51,3 +51,10 @@ export interface PhotoUploadData {
   altText: string
   category: string
 }
+
+export interface PhotoItem {
+  file: File
+  preview: string
+  altText: string
+  id: string
+}

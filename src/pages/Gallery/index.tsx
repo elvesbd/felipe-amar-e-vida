@@ -10,9 +10,9 @@ import { Badge } from "../../components/Badge"
 import Footer from "../Home/components/Footer"
 import { Button } from "../../components/Button"
 import { getGalleryPhotos } from "../../lib/api"
-import PhotoModal from "../../components/PhotoModal"
-import type { GalleryPhoto } from "./interfaces/photo.interface"
 import Pagination from "./components/Pagination"
+import PhotoModal from "../../components/PhotoModal"
+import type { GalleryPhoto } from "../../lib/interfaces/photos.interfaces"
 
 
 export default function GalleryPage() {

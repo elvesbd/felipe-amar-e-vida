@@ -1,17 +1,16 @@
 import type React from "react"
-import { parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { isValid, parse } from "date-fns"
 import { useState, useEffect } from "react"
 import DatePicker, { registerLocale } from "react-datepicker"
 import { X, Upload, Calendar, Clock, ImageIcon, MapPin } from "lucide-react"
 import "react-datepicker/dist/react-datepicker.css"
 
-import type { Event } from "../.."
-import { getPreSignedUrl } from "../../../../../lib/api"
 import { uploadToS3 } from "../../../../../services/s3/upload"
 import { validateEventForm } from "./validation/event-form.validation"
+import { getPreSignedUrl, removeOldEventImage } from "../../../../../lib/api"
+import type { Event, IEvent } from "../../../../../lib/interfaces/events.interfaces"
 
-// Registrar o locale pt-BR
 registerLocale("pt-BR", ptBR)
 
 interface EventFormModalProps {
@@ -49,19 +48,20 @@ export default function EventFormModal({ isOpen, onClose, onSubmit, event }: Eve
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
-  // Pré-preencher formulário quando em modo de edição
   useEffect(() => {
     if (event) {
       setFormData({
-        title: event.pt.title,
-        description: event.pt.description,
-        fullDescription: event.pt.fullDescription ?? "",
-        location: event.pt.location,
+        title: event.titlePt,
+        description: event.descriptionPt,
+        fullDescription: event.fullDescriptionPt ?? "",
+        location: event.location,
         startTime: event.startTime,
         endTime: event.endTime,
       })
-      setImagePreview(event.image)
-      const eventDate = parseISO(event.isoDate)
+      setImagePreview(event.publicUrl)
+      const parsedDate = parse(event.isoDateBR, "dd/MM/yyyy", new Date())
+      const eventDate = isValid(parsedDate) ? parsedDate : null
+
       setSelectedDate(eventDate)
     } else {
       setFormData({
@@ -131,21 +131,17 @@ export default function EventFormModal({ isOpen, onClose, onSubmit, event }: Eve
     setImagePreview(null)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Validar horários
-    const timeErrors: Record<string, string> = {}
+  const validateTimeFields = () => {
+    const errors: Record<string, string> = {}
 
     if (!formData.startTime) {
-      timeErrors.startTime = "Horário de início é obrigatório"
+      errors.startTime = "Horário de início é obrigatório"
     }
 
     if (!formData.endTime) {
-      timeErrors.endTime = "Horário de fim é obrigatório"
+      errors.endTime = "Horário de fim é obrigatório"
     }
 
-    // Verificar se horário de fim é depois do início
     if (formData.startTime && formData.endTime) {
       const [startHour, startMin] = formData.startTime.split(":").map(Number)
       const [endHour, endMin] = formData.endTime.split(":").map(Number)
@@ -154,20 +150,51 @@ export default function EventFormModal({ isOpen, onClose, onSubmit, event }: Eve
       const endMinutes = endHour * 60 + endMin
 
       if (endMinutes <= startMinutes) {
-        timeErrors.endTime = "Horário de fim deve ser posterior ao início"
+        errors.endTime = "Horário de fim deve ser posterior ao início"
       }
     }
 
-    // Criar um objeto de dados para validação
-    const dataToValidate = {
-      ...formData,
-      // Consideramos que há uma data se selectedDate não for nulo
-      date: selectedDate ? "valid-date" : "",
-      // Para validação, criamos um time combinado
-      time: formData.startTime && formData.endTime ? `${formData.startTime} - ${formData.endTime}` : "",
+    return errors
+  }
+
+  const buildValidationData = () => ({
+    ...formData,
+    date: selectedDate ? "valid-date" : "",
+    time: formData.startTime && formData.endTime ? `${formData.startTime} - ${formData.endTime}` : "",
+  })
+
+  const uploadImageIfNeeded = async (): Promise<string> => {
+    if (!formData.image) return event!.publicUrl
+
+    const { signedURL, publicURL } = await getPreSignedUrl(formData.image)
+
+    if (event?.publicUrl) {
+      await removeOldEventImage(event.publicUrl)
     }
 
-    // Usar a função de validação existente
+    await uploadToS3(signedURL, formData.image)
+    return publicURL
+  }
+
+  const buildEventData = (publicUrl: string): IEvent => ({
+    id: event?.id,
+    publicUrl,
+    isoDate: selectedDate ? selectedDate.toISOString() : null,
+    startTime: formData.startTime,
+    endTime: formData.endTime,
+    timezone: TIMEZONE,
+    title: formData.title,
+    description: formData.description,
+    fullDescription: formData.fullDescription || undefined,
+    location: formData.location,
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const timeErrors = validateTimeFields()
+    const dataToValidate = buildValidationData()
+
     const validationErrors = { ...validateEventForm(dataToValidate), ...timeErrors }
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
@@ -179,44 +206,10 @@ export default function EventFormModal({ isOpen, onClose, onSubmit, event }: Eve
     setErrors({})
 
     try {
-      let publicUrl: string | undefined = undefined
-
-      // Se tiver uma nova imagem, fazer upload para o S3
-      if (formData.image) {
-        console.log("Uploading image...")
-        const { signedURL, publicURL } = await getPreSignedUrl(formData.image)
-        await uploadToS3(signedURL, formData.image)
-        publicUrl = publicURL
-        console.log("Image uploaded successfully to S3")
-      }
-
-      // Preparar dados do evento no formato esperado (com pt e en)
-      const eventData = {
-        id: event?.id,
-        image: publicUrl || event?.image,
-        isoDate: selectedDate ? selectedDate.toISOString() : null,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        timezone: TIMEZONE,
-        pt: {
-          title: formData.title,
-          description: formData.description,
-          fullDescription: formData.fullDescription || undefined,
-          location: formData.location,
-        },
-        en: event?.en || {
-          // Manter dados em inglês se estiver editando, ou usar os mesmos do português
-          title: formData.title,
-          description: formData.description,
-          fullDescription: formData.fullDescription || undefined,
-          location: formData.location,
-        },
-      }
-
-      console.log("Event data prepared:", eventData)
+      const publicUrl = await uploadImageIfNeeded()
+      const eventData = buildEventData(publicUrl)
       onSubmit(eventData)
       handleClose()
-      console.log(`Event ${isEditing ? "updated" : "created"} successfully`)
     } catch (error) {
       console.error(`Error ${isEditing ? "updating" : "creating"} event:`, error)
       setErrors({ submit: `Erro ao ${isEditing ? "atualizar" : "criar"} evento. Tente novamente.` })

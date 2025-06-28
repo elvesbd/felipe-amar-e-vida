@@ -15,7 +15,7 @@ interface PhotoModalProps {
 }
 
 export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: PhotoModalProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -71,20 +71,13 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
           <ChevronRight className="h-8 w-8" />
         </Button>
 
-        <div className="relative max-w-full max-h-full">
+        <div className="relative max-w-full max-h-screen">
           <img
             loading="lazy"
             src={photo.publicUrl || "/placeholder.svg"}
             alt={getAltText(photo, i18n.language)}
-            className="max-w-full max-h-full object-contain"
+            className="w-full max-h-screen object-contain"
           />
-
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-            <p className="text-white/80 text-sm">
-              {currentIndex + 1} de {photos.length} • {t(`gallery.categories.${photo.category.toLowerCase()}`)}
-
-            </p>
-          </div>
         </div>
       </div>
     </div>

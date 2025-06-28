@@ -8,7 +8,7 @@ import { Button } from "../../../components/Button"
 import PhotoViewModal from "./components/PhotoViewModal"
 import PhotoUploadModal from "./components/PhotoUploadModal"
 import { deletePhoto, getGalleryPhotos, registerPhoto } from "../../../lib/api"
-import type { GalleryPhoto, UploadedPhotoFormData } from "../../Gallery/interfaces/photo.interface"
+import type { GalleryPhoto, UploadedPhotoFormData } from "../../../lib/interfaces/photos.interfaces"
 
 
 export default function AdminGallery() {
