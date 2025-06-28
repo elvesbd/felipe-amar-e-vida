@@ -1,7 +1,8 @@
 import { twMerge } from "tailwind-merge"
 import { type ClassValue, clsx } from "clsx"
-import type { Event } from "../pages/Events/interfaces/event.interface"
-import type { GalleryPhoto } from "../pages/Gallery/interfaces/photo.interface"
+
+import type { Event } from "../lib/interfaces/events.interfaces"
+import type { GalleryPhoto } from "../lib/interfaces/photos.interfaces"
 
 type Lang = "pt" | "en"
 

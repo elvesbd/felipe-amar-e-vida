@@ -4,7 +4,7 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { Button } from "../Button"
 import { getAltText } from "../../lib/utils"
-import type { GalleryPhoto } from "../../pages/Gallery/interfaces/photo.interface"
+import type { GalleryPhoto } from "../../lib/interfaces/photos.interfaces"
 
 interface PhotoModalProps {
   readonly photo: GalleryPhoto | null
