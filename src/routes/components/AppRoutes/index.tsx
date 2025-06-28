@@ -15,7 +15,7 @@ export default function AppRoutes() {
             <Route
               key={route.path}
               path={route.path}
-              element={<ProtectedRoute adminOnly={route.adminOnly}>{element}</ProtectedRoute>}
+              element={<ProtectedRoute>{element}</ProtectedRoute>}
             />
           )
         }
