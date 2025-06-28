@@ -1,28 +1,9 @@
-import { Calendar, Clock, MapPin } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { Calendar, Clock, MapPin } from "lucide-react"
 
-interface Event {
-  id: number
-  title: {
-    pt: string
-    en: string
-  }
-  description: {
-    pt: string
-    en: string
-  }
-  date: {
-    pt: string
-    en: string
-  }
-  category: {
-    pt: string
-    en: string
-  }
-  time: string
-  location: string
-  image: string
-}
+import type { Event } from "../../../../lib/interfaces/events.interfaces"
+import { getEventDate, getEventTimeRange, getEventTitle } from "../../../../lib/utils"
+
 
 interface EventCardProps {
   readonly event: Event
@@ -40,31 +21,31 @@ export default function EventCard({ event, onClick }: EventCardProps) {
     >
       <div className="relative h-48 overflow-hidden">
         <img
-          src={event.image || "/placeholder.svg"}
-          alt={event.title[language]}
+          src={event.publicUrl || "/placeholder.svg"}
+          alt={getEventTitle(event, language)}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 
       <div className="p-4">
         <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-[#63A6DC] transition-colors">
-          {event.title[language]}
+          {getEventTitle(event, language)}
         </h3>
 
 
         <div className="space-y-2">
           <div className="flex items-center text-sm text-gray-600">
             <Calendar className="h-4 w-4 mr-2 text-[#63A6DC]" />
-            <span>{event.date[language]}</span>
+            <span>{getEventDate(event, language)}</span>
           </div>
 
           <div className="flex items-center text-sm text-gray-600">
             <Clock className="h-4 w-4 mr-2 text-[#63A6DC]" />
-            <span>{event.time}</span>
+            <span>{getEventTimeRange(event)}</span>
           </div>
 
           <div className="flex items-center text-sm text-gray-600">
-            <MapPin className="h-4 w-4 mr-2 text-[#63A6DC]" />
+            <MapPin className="h-4 w-4 mr-1 text-[#63A6DC]" />
             <span className="line-clamp-1">{event.location}</span>
           </div>
         </div>
