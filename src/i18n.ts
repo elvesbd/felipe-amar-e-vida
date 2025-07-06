@@ -55,6 +55,7 @@ i18n
             email: "E-mail",
             message: "Mensagem",
             send: "Enviar Mensagem",
+            sending: "Enviando mensagem...",
             address: "Av. Clóvis Arrais Maia, 3070 - Vicente Pinzon, Fortaleza - CE",
             phone: "(85) 98837-8608",
             socialTitle: "Siga nas redes sociais"
@@ -116,6 +117,7 @@ i18n
             email: "Email",
             message: "Message",
             send: "Send Message",
+            sending: "Sending message...",
             address: "Av. Clóvis Arrais Maia, 3070 - Vicente Pinzon, Fortaleza - CE",
             phone: "(85) 98837-8608",
             socialTitle: "Follow us on social media"

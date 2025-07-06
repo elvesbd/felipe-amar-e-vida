@@ -1,13 +1,46 @@
+import { toast } from "react-toastify"
+import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { MapPin, Phone, Mail } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
 
+import { sendMail } from "../../../../lib/api"
 import { Input } from "../../../../components/Input"
 import { Button } from "../../../../components/Button"
 import { Textarea } from "../../../../components/TextArea"
+import { contactSchema, type ContactFormData } from "./validations/contact-form.validation"
+
 
 export default function Contact() {
   const { t } = useTranslation()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+  })
+
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      await sendMail(data)
+      toast.success("Mensagem enviada com sucesso!")
+      reset()
+    } catch (error: any) {
+      const apiError = error?.response?.data
+
+      if (apiError?.errors?.length) {
+        toast.error(apiError.errors[0].message)
+      } else if (apiError?.message) {
+        toast.error(apiError.message)
+      } else {
+        toast.error("Erro ao enviar mensagem. Tente novamente.")
+      }
+    }
+  }
 
   return (
     <section id="contact" className="py-16 bg-white w-full min-h-screen flex items-center">
@@ -57,12 +90,42 @@ export default function Contact() {
               <h3 className="text-xl font-semibold mb-2">{t("contact.title")}</h3>
               <p className="text-gray-600">{t("contact.subtitle")}</p>
             </div>
-            <div className="space-y-4">
-              <Input placeholder={t("contact.name")} />
-              <Input type="email" placeholder={t("contact.email")} />
-              <Textarea placeholder={t("contact.message")} rows={4} />
-              <Button className="w-full bg-[#63A6DC] hover:bg-[#4a8bc4] text-white">{t("contact.send")}</Button>
-            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div>
+                <Input
+                  {...register("name")}
+                  placeholder={t("contact.name")}
+                />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+              </div>
+
+              <div>
+                <Input
+                  {...register("email")}
+                  type="email"
+                  placeholder={t("contact.email")}
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+              </div>
+
+              <div>
+                <Textarea
+                  {...register("message")}
+                  placeholder={t("contact.message")}
+                  rows={4}
+                />
+                {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>}
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-[#63A6DC] hover:bg-[#4a8bc4] text-white"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? t("contact.sending") : t("contact.send")}
+              </Button>
+            </form>
           </div>
         </div>
       </div>

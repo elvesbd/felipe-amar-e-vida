@@ -13,6 +13,8 @@ import type {
   DeleteEventResponse,
   RegisterEventResponse
 } from "./interfaces/events.interfaces"
+import type { SendEmailResponse } from "./interfaces/email.interfaces"
+import type { ContactFormData } from "../pages/Home/components/Contact/validations/contact-form.validation"
 
 export interface PreSignedUrlResponse {
   signedURL: string
@@ -246,11 +248,13 @@ export async function getPreSignedUrl(file: File) {
   }
 }
 
-export function formatarDinheiro(valor: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(valor)
+export async function sendMail(data: ContactFormData) {
+  try {
+    return await api.post<SendEmailResponse>("/email/send", data)
+  } catch (error) {
+    console.error("Erro ao enviar email:", error)
+    throw error
+  }
 }
 
 export function formatarData(dataString: string): string {
