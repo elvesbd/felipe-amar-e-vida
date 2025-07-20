@@ -1,19 +1,18 @@
+import { X } from "lucide-react"
 import { useEffect } from "react"
-import { X, Trash2, Download } from "lucide-react"
 
 import { Button } from "../../../../../components/Button"
-import { downloadFileFromUrl } from "../../../../../lib/utils"
-import type { GalleryPhoto } from "../../../../../lib/interfaces/photos.interfaces"
 import ImageWithPlaceholder from "../../../../../components/ImageWithPlaceholder"
+import type { GalleryPhoto } from "../../../../../lib/interfaces/photos.interfaces"
 
 
 interface PhotoViewModalProps {
   readonly photo: GalleryPhoto | null
   readonly onClose: () => void
-  readonly onDelete: (photo: GalleryPhoto) => void
 }
 
-export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewModalProps) {
+export default function PhotoViewModal({ photo, onClose }: PhotoViewModalProps) {
+  console.log('photo', photo)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -30,60 +29,35 @@ export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewMo
     }
   }, [photo, onClose])
 
-  const handleDelete = () => {
-    if (photo && window.confirm(`Tem certeza que deseja excluir a foto?`)) {
-      onDelete(photo)
-      onClose()
-    }
-  }
-
-  const handleDownload = () => {
-    if (photo) downloadFileFromUrl(photo.publicUrl, `${photo.id}`)
-  }
-
   if (!photo) return null
 
   return (
-    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-      <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 right-4 text-white hover:bg-white/20 z-10 backdrop-blur-sm"
-          onClick={onClose}
-        >
-          <X className="h-6 w-6" />
-        </Button>
+    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 min-h-screen">
+      <div className="relative max-w-4xl max-h-[calc(100vh-2rem)] w-full flex flex-col md:flex-row items-center justify-center gap-4 px-4 md:px-12">
 
-        <div className="absolute top-4 left-4 flex space-x-2 z-10">
+        {/* Container da imagem com relative */}
+        <div className="relative flex-1 flex items-center justify-center max-h-[90vh] w-full">
+
+          {/* Botão fechar fica aqui dentro, absolute relativo ao container da imagem */}
           <Button
             variant="ghost"
-            size="sm"
-            onClick={handleDownload}
-            className="text-white hover:bg-white/20 backdrop-blur-sm"
+            size="icon"
+            className="absolute top-0.5 right-4 text-white hover:bg-white/20 z-10 backdrop-blur-sm"
+            onClick={onClose}
+            aria-label="Fechar"
           >
-            <Download className="h-4 w-4 mr-2" />
-            Download
+            <X className="h-6 w-6" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleDelete}
-            className="text-white hover:bg-red-500/20 backdrop-blur-sm"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Excluir
-          </Button>
-        </div>
 
-        <div className="relative max-w-full max-h-full">
           <ImageWithPlaceholder
             src={photo.publicUrl || "/placeholder.svg"}
             alt={photo.altTextPt}
-            className="max-w-full max-h-full object-contain"
+            className="max-w-full max-h-[90vh] object-contain md:max-w-[80%]"
           />
         </div>
       </div>
     </div>
+
+
   )
 }
