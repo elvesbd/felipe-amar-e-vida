@@ -72,11 +72,11 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
           <ChevronRight className="h-8 w-8" />
         </Button>
 
-        <div className="relative max-w-full max-h-screen">
+        <div className="relative w-full h-full flex items-center justify-center p-8">
           <ImageWithPlaceholder
             src={photo.publicUrl || "/placeholder.svg"}
             alt={getAltText(photo, i18n.language)}
-            className="w-full max-h-screen object-contain"
+            className="max-w-[90vw] max-h-[90vh]"
           />
         </div>
       </div>

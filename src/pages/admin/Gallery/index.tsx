@@ -29,8 +29,6 @@ export default function AdminGallery() {
         showLoader()
         setIsLoading(true)
         const response = await getGalleryPhotos()
-        await new Promise((resolve) => setTimeout(resolve, 5000)) // Delay para ver o loader
-
         setPhotos(response)
 
         response.forEach((photo) => {
@@ -247,7 +245,7 @@ export default function AdminGallery() {
         />
 
         {/* Modal de Visualização */}
-        <PhotoViewModal photo={viewingPhoto} onClose={() => setViewingPhoto(null)} onDelete={handleDelete} />
+        <PhotoViewModal photo={viewingPhoto} onClose={() => setViewingPhoto(null)} />
       </div>
     </>
   )
