@@ -18,11 +18,15 @@ export default function ImageWithPlaceholder({ src, alt, className = "" }: Image
         src={src}
         alt={alt}
         onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)} // evita loader travado
-        className={`w-full h-full object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"
-          }`}
+        onError={() => setLoaded(true)}
+        className={`
+          max-w-full max-h-full object-contain mx-auto my-auto
+          transition-opacity duration-300
+          ${loaded ? "opacity-100" : "opacity-0"}
+        `}
         loading="lazy"
       />
     </div>
   )
 }
+
