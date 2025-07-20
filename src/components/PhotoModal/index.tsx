@@ -5,6 +5,7 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "../Button"
 import { getAltText } from "../../lib/utils"
 import type { GalleryPhoto } from "../../lib/interfaces/photos.interfaces"
+import ImageWithPlaceholder from "../ImageWithPlaceholder"
 
 interface PhotoModalProps {
   readonly photo: GalleryPhoto | null
@@ -72,8 +73,7 @@ export default function PhotoModal({ photo, photos, onClose, onNext, onPrev }: P
         </Button>
 
         <div className="relative max-w-full max-h-screen">
-          <img
-            loading="lazy"
+          <ImageWithPlaceholder
             src={photo.publicUrl || "/placeholder.svg"}
             alt={getAltText(photo, i18n.language)}
             className="w-full max-h-screen object-contain"

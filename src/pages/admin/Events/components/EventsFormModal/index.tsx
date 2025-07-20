@@ -10,6 +10,7 @@ import { uploadToS3 } from "../../../../../services/s3/upload"
 import { validateEventForm } from "./validation/event-form.validation"
 import { getPreSignedUrl, removeOldEventImage } from "../../../../../lib/api"
 import type { Event, IEvent } from "../../../../../lib/interfaces/events.interfaces"
+import ImageWithPlaceholder from "../../../../../components/ImageWithPlaceholder"
 
 registerLocale("pt-BR", ptBR)
 
@@ -427,7 +428,7 @@ export default function EventFormModal({ isOpen, onClose, onSubmit, event }: Eve
             ) : (
               <div className="space-y-4">
                 <div className="relative">
-                  <img
+                  <ImageWithPlaceholder
                     src={imagePreview || "/placeholder.svg"}
                     alt="Preview"
                     className="w-full h-48 object-cover rounded-lg"
