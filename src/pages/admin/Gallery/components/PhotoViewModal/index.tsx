@@ -4,6 +4,7 @@ import { X, Trash2, Download } from "lucide-react"
 import { Button } from "../../../../../components/Button"
 import { downloadFileFromUrl } from "../../../../../lib/utils"
 import type { GalleryPhoto } from "../../../../../lib/interfaces/photos.interfaces"
+import ImageWithPlaceholder from "../../../../../components/ImageWithPlaceholder"
 
 
 interface PhotoViewModalProps {
@@ -76,7 +77,7 @@ export default function PhotoViewModal({ photo, onClose, onDelete }: PhotoViewMo
         </div>
 
         <div className="relative max-w-full max-h-full">
-          <img
+          <ImageWithPlaceholder
             src={photo.publicUrl || "/placeholder.svg"}
             alt={photo.altTextPt}
             className="max-w-full max-h-full object-contain"

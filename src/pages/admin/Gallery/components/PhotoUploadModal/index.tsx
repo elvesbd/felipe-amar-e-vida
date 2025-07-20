@@ -10,6 +10,7 @@ import { Button } from "../../../../../components/Button"
 import { Textarea } from "../../../../../components/TextArea"
 import { uploadToS3 } from "../../../../../services/s3/upload"
 import type { PhotoItem, UploadedPhotoFormData } from "../../../../../lib/interfaces/photos.interfaces"
+import ImageWithPlaceholder from "../../../../../components/ImageWithPlaceholder"
 
 
 interface PhotoUploadModalProps {
@@ -236,8 +237,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSubmit }: PhotoUpl
                     <div className="flex gap-4">
                       {/* Preview da Imagem */}
                       <div className="relative flex-shrink-0">
-                        <img
-                          loading="lazy"
+                        <ImageWithPlaceholder
                           src={photo.preview || "/placeholder.svg"}
                           alt={`Preview ${index + 1}`}
                           className="w-24 h-24 object-cover rounded-lg"

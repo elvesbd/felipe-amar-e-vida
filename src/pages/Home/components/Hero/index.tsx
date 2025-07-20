@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "../../../../components/Button";
+import ImageWithPlaceholder from "../../../../components/ImageWithPlaceholder";
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -41,7 +42,11 @@ export default function Hero() {
             className={`absolute inset-0 transition-opacity duration-500 ${index === currentSlide ? "opacity-100" : "opacity-0"
               }`}
           >
-            <img src={slide.image || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
+            <ImageWithPlaceholder
+              src={slide.image || "/placeholder.svg"}
+              alt=""
+              className="w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-black/40" />
           </div>
         ))}
