@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 import { Calendar, Clock, MapPin } from "lucide-react"
 
 import type { Event } from "../../../../lib/interfaces/events.interfaces"
+import ImageWithPlaceholder from "../../../../components/ImageWithPlaceholder"
 import { getEventDate, getEventTimeRange, getEventTitle } from "../../../../lib/utils"
 
 
@@ -20,10 +21,10 @@ export default function EventCard({ event, onClick }: EventCardProps) {
       onClick={() => onClick(event)}
     >
       <div className="relative h-48 overflow-hidden">
-        <img
+        <ImageWithPlaceholder
           src={event.publicUrl || "/placeholder.svg"}
           alt={getEventTitle(event, language)}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 

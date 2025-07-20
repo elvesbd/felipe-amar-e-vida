@@ -11,6 +11,7 @@ import {
   getEventDescription,
   getEventFullDescription,
 } from "../../../../lib/utils"
+import ImageWithPlaceholder from "../../../../components/ImageWithPlaceholder"
 
 interface EventModalProps {
   readonly event: Event | null
@@ -44,7 +45,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
       <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="relative">
-          <img
+          <ImageWithPlaceholder
             src={event.publicUrl || "/placeholder.svg"}
             alt={getEventTitle(event, language)}
             className="w-full h-64 object-cover"

@@ -6,20 +6,24 @@ import { useEffect, useState, useMemo } from "react"
 
 import Header from "../../components/Header"
 import { getAltText } from "../../lib/utils"
-import { Badge } from "../../components/Badge"
 import Footer from "../Home/components/Footer"
 import { Button } from "../../components/Button"
 import { getGalleryPhotos } from "../../lib/api"
 import Pagination from "./components/Pagination"
 import PhotoModal from "../../components/PhotoModal"
+import CategorySelector from "./components/Categories"
+import { useFullPageLoader } from "../../hooks/useFullPageLoader"
 import type { GalleryPhoto } from "../../lib/interfaces/photos.interfaces"
+import ImageWithPlaceholder from "../../components/ImageWithPlaceholder"
 
 
 export default function GalleryPage() {
   const photosPerPage = 12
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
+  const { showLoader, hideLoader, Loader } = useFullPageLoader()
 
+  const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
@@ -32,6 +36,8 @@ export default function GalleryPage() {
   useEffect(() => {
     async function fetchPhotos() {
       try {
+        showLoader()
+        setIsLoading(true)
         const response = await getGalleryPhotos()
         setPhotos(response)
 
@@ -44,18 +50,13 @@ export default function GalleryPage() {
       } catch (error) {
         console.error("Erro ao carregar fotos:", error)
         toast.error("Erro ao carregar fotos da galeria. Tente novamente mais tarde.")
+      } finally {
+        hideLoader()
+        setIsLoading(false)
       }
     }
     fetchPhotos()
-  }, [])
-
-  const categories = [
-    { key: "all", label: t("gallery.categories.all") },
-    { key: "Aulas", label: t("gallery.categories.aulas") },
-    { key: "Eventos", label: t("gallery.categories.eventos") },
-    { key: "Equipamentos", label: t("gallery.categories.equipamentos") },
-  ]
-
+  }, [hideLoader, showLoader])
 
   const filteredPhotos = useMemo(() => {
     return selectedCategory === "all"
@@ -96,88 +97,86 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <>
+      {Loader}
 
-      <div className="flex-grow">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 text-[#63A6DC] hover:text-[#4a8bc4]">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t("gallery.backToHome")}
-            </Button>
-          </div>
+      <div className="flex flex-col min-h-screen">
+        {!isLoading && (
+          <>
+            <Header />
 
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Badge
-                  key={category.key}
-                  variant={selectedCategory === category.key ? "default" : "secondary"}
-                  className={`cursor-pointer px-4 py-2 text-sm ${selectedCategory === category.key ? "bg-[#63A6DC] hover:bg-[#4a8bc4]" : "hover:bg-gray-200"
-                    }`}
-                  onClick={() => {
-                    setSelectedCategory(category.key)
-                    setCurrentPage(1)
-                  }}
-                >
-                  {category.label}
-                </Badge>
-              ))}
-            </div>
-          </div>
+            <div className="flex-grow">
+              <div className="container mx-auto px-4 py-8">
+                <div className="mb-8">
+                  <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 text-[#63A6DC] hover:text-[#4a8bc4]">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    {t("gallery.backToHome")}
+                  </Button>
+                </div>
 
-          {currentPhotos.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                {currentPhotos.map((photo) => (
-                  <button
-                    key={photo.id}
-                    className="relative group cursor-pointer overflow-hidden rounded-lg bg-white shadow-md hover:shadow-xl transition-all duration-300"
-                    onClick={() => openModal(photo)}
-                  >
-                    <div className="aspect-square">
-                      <img
-                        loading="lazy"
-                        src={photo.publicUrl || "/placeholder.svg"}
-                        alt={getAltText(photo, i18n.language)}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                <div className="mb-8">
+                  <CategorySelector
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={(key) => {
+                      setSelectedCategory(key)
+                      setCurrentPage(1)
+                    }}
+                  />
+                </div>
+
+                {currentPhotos.length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+                      {currentPhotos.map((photo) => (
+                        <button
+                          key={photo.id}
+                          className="relative group cursor-pointer overflow-hidden rounded-lg bg-white shadow-md hover:shadow-xl transition-all duration-300"
+                          onClick={() => openModal(photo)}
+                        >
+                          <div className="aspect-square">
+                            <ImageWithPlaceholder
+                              src={photo.publicUrl || "/placeholder.svg"}
+                              alt={getAltText(photo, i18n.language)}
+                              className="group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                          <div className="absolute bottom-0 left-0 right-auto bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <p className="text-white/80 text-xs">  {t(`gallery.categories.${photo.category.toLowerCase()}`)}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {totalPages > 1 && (
+                      <Pagination
+                        totalPages={totalPages}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
                       />
-                    </div>
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                    <div className="absolute bottom-0 left-0 right-auto bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <p className="text-white/80 text-xs">  {t(`gallery.categories.${photo.category.toLowerCase()}`)}
-                      </p>
-                    </div>
-                  </button>
-                ))}
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-16">
+                    <p className="text-gray-500 text-lg">{t("gallery.noPhotos")}</p>
+                  </div>
+                )}
               </div>
-
-              {totalPages > 1 && (
-                <Pagination
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  onPageChange={setCurrentPage}
-                />
-              )}
-            </>
-          ) : (
-            <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">{t("gallery.noPhotos")}</p>
             </div>
-          )}
-        </div>
+
+            <PhotoModal
+              onNext={nextPhoto}
+              onPrev={prevPhoto}
+              onClose={closeModal}
+              photo={selectedPhoto}
+              photos={filteredPhotos}
+            />
+
+            <Footer />
+          </>
+        )}
       </div>
-
-      <PhotoModal
-        onNext={nextPhoto}
-        onPrev={prevPhoto}
-        onClose={closeModal}
-        photo={selectedPhoto}
-        photos={filteredPhotos}
-      />
-
-      <Footer />
-    </div>
+    </>
   )
 }
