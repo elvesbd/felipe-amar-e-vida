@@ -15,9 +15,9 @@ export default function About() {
           {/* Layout para desktop (1024px+) */}
           <div className="hidden xl:grid xl:grid-cols-2 xl:gap-12 xl:items-start">
             <div className="w-full">
-              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+              <div className="aspect-[3/2] w-full rounded-lg overflow-hidden">
                 <img
-                  src="/about.jpg"
+                  src="/about.png"
                   alt="Projeto Felipe A Maré Vida - Surfe Adaptado"
                   className="w-full h-full object-cover"
                 />
@@ -31,9 +31,9 @@ export default function About() {
           {/* Layout em L para tablets (768px-1023px) */}
           <div className="hidden md:block xl:hidden">
             <div className="float-left mr-6 mb-4 w-1/2 max-w-sm">
-              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+              <div className="aspect-[3/2] w-full rounded-lg overflow-hidden">
                 <img
-                  src="/about.jpg"
+                  src="/about.png"
                   alt="Projeto Felipe A Maré Vida - Surfe Adaptado"
                   className="w-full h-full object-cover"
                 />
@@ -48,9 +48,9 @@ export default function About() {
           {/* Layout em coluna para mobile (<768px) */}
           <div className="md:hidden">
             <div className="mb-6">
-              <div className="aspect-[4/3] w-full rounded-lg overflow-hidden">
+              <div className="aspect-[3/2] w-full rounded-lg overflow-hidden">
                 <img
-                  src="/about.jpg"
+                  src="/about.png"
                   alt="Projeto Felipe A Maré Vida - Surfe Adaptado"
                   className="w-full h-full object-cover"
                 />
