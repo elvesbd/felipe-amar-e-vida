@@ -40,7 +40,7 @@ export default function Schedule() {
 
           <div className="group">
             <a
-              href="https://www.google.com/maps/place/PF+Surf+School/@-3.7335417,-38.4593165,885m/data=!3m2!1e3!4b1!4m6!3m5!1s0x7c74687cbea5dbb:0x7abdc221f5f11b12!8m2!3d-3.7335417!4d-38.4567416!16s%2Fg%2F11cr_rwz77?entry=ttu&g_ep=EgoyMDI1MDkxNy4wIKXMDSoASAFQAw%3D%3D"
+              href="https://maps.app.goo.gl/LU8L8fQ1MhmB9EQc6"
               target="_blank"
               rel="noopener noreferrer"
               title="Localização"
