@@ -47,12 +47,17 @@ export default function MobileMenu() {
 
   const handleGalleryClick = () => {
     setIsOpen(false)
-    navigate("/gallery")
+    navigate("/galeria")
   }
 
   const handleEventsClick = () => {
     setIsOpen(false)
-    navigate("/events")
+    navigate("/eventos")
+  }
+
+  const handleTransparencyClick = () => {
+    setIsOpen(false)
+    navigate("/transparencia")
   }
 
   return (
@@ -112,6 +117,12 @@ export default function MobileMenu() {
             className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           >
             {t("nav.contact")}
+          </button>
+          <button
+            onClick={handleTransparencyClick}
+            className="py-3 px-4 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            {t("nav.transparency")}
           </button>
 
           {/* Divisor */}
