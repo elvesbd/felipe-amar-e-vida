@@ -19,6 +19,7 @@ i18n
             gallery: "Galeria",
             events: "Eventos",
             contact: "Contato",
+            transparency: "Transparência",
           },
           gallery: {
             categories: {
@@ -46,7 +47,7 @@ i18n
             title: "Horários das Aulas",
             days: "Terças e Quintas-feiras",
             time: "14h45 às 17h",
-            location: "PF Surf School - Praia do Futuro",
+            location: "PF Surf School",
           },
           contact: {
             title: "Entre em Contato",
@@ -65,7 +66,21 @@ i18n
             noEvents: "Nenhum evento encontrado.",
             previous: "Anterior",
             next: "Próxima"
-          }
+          },
+          transparencyPage: {
+            description:
+              "Com o objetivo de prestar contas à sociedade, disponibilizamos neste espaço o arquivo com informações relacionadas aos recursos recebidos de emendas parlamentares para projetos da instituição.",
+            noAmendments: "Nenhuma Emenda Registrada",
+            noAmendmentsDescription:
+              "Até o momento, este projeto não recebeu nenhuma emenda parlamentar. Quando houver movimentações, todos os documentos serão publicados aqui.",
+            followUpdates: "Acompanhe esta página para futuras atualizações",
+            whatAreAmendments: "O que são emendas?",
+            amendmentsDescription:
+              "Emendas parlamentares são recursos destinados por deputados e senadores para projetos específicos em municípios e estados.",
+            ourCommitment: "Nosso compromisso",
+            commitmentDescription:
+              "Quando recebermos recursos, publicaremos aqui todos os documentos, valores e destinações de forma clara e acessível.",
+          },
         },
       },
       en: {
@@ -80,6 +95,7 @@ i18n
             gallery: "Gallery",
             events: "Events",
             contact: "Contact",
+            transparency: "Transparency",
           },
           gallery: {
             categories: {
@@ -108,7 +124,7 @@ i18n
             title: "Class Schedule",
             days: "Tuesdays and Thursdays",
             time: "2:45 PM to 5:00 PM",
-            location: "PF Surf School - Praia do Futuro",
+            location: "PF Surf School",
           },
           contact: {
             title: "Get in Touch",
@@ -119,7 +135,7 @@ i18n
             send: "Send Message",
             sending: "Sending message...",
             address: "Av. Clóvis Arrais Maia, 3070 - Vicente Pinzon, Fortaleza - CE",
-            phone: "(85) 98837-8608",
+            phone: "+55 85 98837-8608",
             socialTitle: "Follow us on social media"
           },
           eventsPage: {
@@ -127,7 +143,21 @@ i18n
             noEvents: "No events found.",
             previous: "Previous",
             next: "Next"
-          }
+          },
+          transparencyPage: {
+            description:
+              "With the aim of being accountable to society, we provide in this space the file with information related to funds received from parliamentary amendments for the institution's projects.",
+            noAmendments: "No Amendments Registered",
+            noAmendmentsDescription:
+              "So far, this project has not received any parliamentary amendments. When there are movements, all documents will be published here.",
+            followUpdates: "Follow this page for future updates",
+            whatAreAmendments: "What are amendments?",
+            amendmentsDescription:
+              "Parliamentary amendments are resources allocated by deputies and senators for specific projects in municipalities and states.",
+            ourCommitment: "Our commitment",
+            commitmentDescription:
+              "When we receive resources, we will publish here all documents, amounts and allocations in a clear and accessible way.",
+          },
         },
       },
     },

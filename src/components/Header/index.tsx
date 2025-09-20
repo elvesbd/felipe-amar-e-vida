@@ -42,11 +42,15 @@ export default function Header() {
   }
 
   const handleGalleryClick = () => {
-    navigate("/gallery")
+    navigate("/galeria")
   }
 
   const handleEventsClick = () => {
-    navigate("/events")
+    navigate("/eventos")
+  }
+
+  const handleTransparencyClick = () => {
+    navigate("/transparencia")
   }
 
   return (
@@ -66,33 +70,39 @@ export default function Header() {
           <nav className="flex items-center space-x-6">
             <button
               onClick={() => scrollToSection("home")}
-              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
+              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm cursor-pointer"
             >
               {t("nav.home")}
             </button>
             <button
               onClick={() => scrollToSection("about")}
-              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
+              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm cursor-pointer"
             >
               {t("nav.about")}
             </button>
             <button
               onClick={handleGalleryClick}
-              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
+              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm cursor-pointer"
             >
               {t("nav.gallery")}
             </button>
             <button
               onClick={handleEventsClick}
-              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
+              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm cursor-pointer"
             >
               {t("nav.events")}
             </button>
             <button
               onClick={() => scrollToSection("contact")}
-              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm"
+              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm cursor-pointer"
             >
               {t("nav.contact")}
+            </button>
+            <button
+              onClick={handleTransparencyClick}
+              className="text-gray-700 hover:text-[#63A6DC] transition-colors font-medium text-sm cursor-pointer"
+            >
+              {t("nav.transparency")}
             </button>
           </nav>
 

@@ -1,11 +1,12 @@
 import type React from "react"
 import HomePage from "../pages/Home"
-import GalleryPage from "../pages/Gallery"
-import EventsPage from "../pages/Events"
 import LoginPage from "../pages/Login"
-import AdminDashboard from "../pages/admin/Dashboard"
+import EventsPage from "../pages/Events"
+import GalleryPage from "../pages/Gallery"
 import AdminEvents from "../pages/admin/Events"
 import AdminGallery from "../pages/admin/Gallery"
+import TransparencyPage from "../pages/Transparency"
+import AdminDashboard from "../pages/admin/Dashboard"
 
 export interface RouteConfig {
   path: string
@@ -22,12 +23,16 @@ export const routes: RouteConfig[] = [
     exact: true,
   },
   {
-    path: "/gallery",
+    path: "/galeria",
     component: GalleryPage,
   },
   {
-    path: "/events",
+    path: "/eventos",
     component: EventsPage,
+  },
+  {
+    path: "/transparencia",
+    component: TransparencyPage,
   },
   {
     path: "/login",
