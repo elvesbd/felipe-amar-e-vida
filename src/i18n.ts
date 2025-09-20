@@ -47,7 +47,7 @@ i18n
             title: "Horários das Aulas",
             days: "Terças e Quintas-feiras",
             time: "14h45 às 17h",
-            location: "PF Surf School",
+            location: "Felipe A Maré Vida",
           },
           contact: {
             title: "Entre em Contato",
@@ -57,7 +57,7 @@ i18n
             message: "Mensagem",
             send: "Enviar Mensagem",
             sending: "Enviando mensagem...",
-            address: "Av. Clóvis Arrais Maia, 3070 - Vicente Pinzon, Fortaleza - CE",
+            address: "Av. Clóvis Arrais Maia, 4679 - Praia do Futuro II, Fortaleza - CE",
             phone: "(85) 98837-8608",
             socialTitle: "Siga nas redes sociais"
           },
@@ -124,7 +124,7 @@ i18n
             title: "Class Schedule",
             days: "Tuesdays and Thursdays",
             time: "2:45 PM to 5:00 PM",
-            location: "PF Surf School",
+            location: "Felipe A Maré Vida",
           },
           contact: {
             title: "Get in Touch",
@@ -134,7 +134,7 @@ i18n
             message: "Message",
             send: "Send Message",
             sending: "Sending message...",
-            address: "Av. Clóvis Arrais Maia, 3070 - Vicente Pinzon, Fortaleza - CE",
+            address: "Av. Clóvis Arrais Maia, 4679 - Praia do Futuro II, Fortaleza - CE",
             phone: "+55 85 98837-8608",
             socialTitle: "Follow us on social media"
           },
