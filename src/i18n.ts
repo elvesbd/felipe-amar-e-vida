@@ -33,7 +33,7 @@ i18n
             loading: "Carregando fotos...",
           },
           footer: {
-            message: "© 2025 Felipe A Maré Vida. Transformando vidas através do surfe."
+            message: "© 2026 Felipe A Maré Vida. Transformando vidas através do surfe."
           },
           about: {
             title: "Sobre o Projeto",
@@ -109,7 +109,7 @@ i18n
             loading: "Loading photos...",
           },
           footer: {
-            message: "© 2025 Felipe A Maré Vida. Transforming lives through surfing."
+            message: "© 2026 Felipe A Maré Vida. Transforming lives through surfing."
           },
           about: {
             title: "About the Project",
