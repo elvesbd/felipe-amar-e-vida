@@ -10,17 +10,17 @@ export default function Hero() {
     {
       id: 1,
       image:
-        "/banner_1.jpeg",
+        "587674113_18548784385009063_2377714485064461584_n.jpg",
     },
     {
       id: 2,
       image:
-        "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80",
+        "730854617_18423683977133075_7684086336122005794_n.jpg",
     },
     {
       id: 3,
       image:
-        "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80",
+        "545227045_18380514238133075_4310564316145898485_n.jpg",
     },
   ]
 
@@ -46,7 +46,7 @@ export default function Hero() {
               alt=""
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0" />
           </div>
         ))}
       </div>
